@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Inserir a tarefa concluída no banco de dados
+    const sql = getDb();
     const result = await sql`
       INSERT INTO taskscompleted (taskid, sessionid, timestamp)
       VALUES (${taskId}, ${sessionId}, NOW())

@@ -1,8 +1,5 @@
-import { neon } from '@neondatabase/serverless';
+import { getDb } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
-
-
-const sql = neon(process.env.DATABASE_URL as string);
 
 export async function POST(req: NextRequest) {
     try {
@@ -19,6 +16,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'Missing userId or platformId' }, { status: 400 });
         }
         
+        const sql = getDb();
         const checkResult = await sql.query(
             `SELECT id FROM Sessions 
              WHERE userId = $1 

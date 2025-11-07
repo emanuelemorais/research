@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Inserir o clique no banco de dados
+    const sql = getDb();
     const result = await sql`
       INSERT INTO buttonclicks (buttonid, sessionid, timestamp)
       VALUES (${buttonId}, ${sessionId}, NOW())

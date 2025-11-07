@@ -15,4 +15,3 @@ export function getDb() {
   return sql;
 }
 
-

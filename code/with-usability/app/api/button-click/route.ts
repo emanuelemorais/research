@@ -1,7 +1,5 @@
-import { neon } from '@neondatabase/serverless';
+import { getDb } from '@/lib/db';
 import { NextRequest } from 'next/server';
-
-const sql = neon(process.env.DATABASE_URL as string);
 
 export async function POST(req: NextRequest) {
     try {
@@ -12,6 +10,7 @@ export async function POST(req: NextRequest) {
         }
         
         // Insere o clique do botão na tabela
+        const sql = getDb();
         const result = await sql.query(
             `INSERT INTO buttonclicks (buttonid, sessionid, timestamp)
              VALUES ($1, $2, NOW())

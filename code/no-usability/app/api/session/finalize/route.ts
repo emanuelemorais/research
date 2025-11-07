@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       );
     }
     
+    const sql = getDb();
     // Verifica se a sessão existe e ainda não está finalizada
     const checkResult = await sql`
       SELECT id FROM Sessions 
