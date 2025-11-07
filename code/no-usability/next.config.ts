@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
     // Ignore type errors in node_modules (like @ethereumjs/tx)
     ignoreBuildErrors: true,
   },
+  eslint: {
+    // Disable ESLint during builds if not installed
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

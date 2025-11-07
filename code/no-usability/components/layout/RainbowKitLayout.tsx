@@ -19,9 +19,21 @@ import { useRouter } from 'next/navigation';
 import { http, fallback } from 'wagmi';
 import { AppContextProvider } from '@/contexts/AppContext';
 
+// Get projectId with fallback for build time
+const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '';
+
+// Only validate in browser (client-side)
+if (typeof window !== 'undefined' && !projectId) {
+  throw new Error(
+    'NEXT_PUBLIC_PROJECT_ID is required. Please set it in your .env.local file. ' +
+    'Get your projectId from https://cloud.walletconnect.com/'
+  );
+}
+
+// Create config with projectId (will use empty string during build if not set)
 const config = getDefaultConfig({
     appName: 'DeFi Platform',
-    projectId: process.env.NEXT_PUBLIC_PROJECT_ID as string,
+    projectId: projectId || '00000000000000000000000000000000', // Temporary placeholder for build
     chains: [sepolia],
     transports: {
       [sepolia.id]: fallback([

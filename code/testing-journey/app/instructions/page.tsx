@@ -106,12 +106,12 @@ export default function InstructionsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Prerequisites */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
               <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
                 Pré-requisitos
               </h3>
-              <div className="space-y-2 text-green-800 text-sm">
+              <div className="space-y-3 text-green-800 text-sm">
                 <p>
                   • Instalar MetaMask{' '}
                   <a
@@ -125,19 +125,53 @@ export default function InstructionsPage() {
                   </a>{' '}
                   e seguir os passos previamente explicados no próprio aplicativo
                 </p>
-                <p>
-                  • Caso precise de assistência, me mande uma mensagem clicando no botão abaixo
-                </p>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
+                  <p className="font-semibold text-green-900 mb-2">
+                    • Solicitar tokens nativos para gás (Ethereum Sepolia)
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Para realizar as transações na plataforma, você precisará de tokens ETH na rede Sepolia para pagar as taxas de gás. Siga os passos abaixo:
+                  </p>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <p>
+                      <strong>Passo 1:</strong> Acesse o link:{' '}
+                      <a
+                        href="https://cloud.google.com/application/web3/faucet/ethereum/sepolia"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline inline-flex items-center gap-1 font-medium"
+                      >
+                        Google Cloud Web3 Faucet
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </p>
+                    <p>
+                      <strong>Passo 2:</strong> Coloque o endereço da carteira e clique em "Get 0.05 Sepolia ETH"
+                    </p>
+                  </div>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAssistance}
-                className="mt-3 border-green-300 text-green-700 hover:bg-green-100 cursor-pointer"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Solicitar Assistência
-              </Button>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-yellow-900 mb-2">
+                      <strong>Problemas ou dúvidas?</strong> Se você encontrar dificuldades ao solicitar os tokens do faucet, instalar o MetaMask ou tiver qualquer dúvida, clique no botão abaixo para solicitar assistência.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAssistance}
+                      className="border-yellow-300 text-yellow-700 hover:bg-yellow-100 cursor-pointer"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Solicitar Assistência
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Platform 1 Steps */}
