@@ -22,10 +22,17 @@ import {
   ArrowUpRight,
   LogOut,
   Info,
+  Copy,
+  Check,
 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function InstructionsPage() {
   const router = useRouter();
+  const [copied, setCopied] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+  const walletAddress = '0x41415c8842a214db47765e4b0fe39a4530b0b7c0';
+  const emailAddress = 'emanuele.martins@sou.inteli.edu.br';
 
   const handleGoHome = () => {
     router.push('/');
@@ -33,6 +40,26 @@ export default function InstructionsPage() {
 
   const handleAssistance = () => {
     window.open('https://wa.me/5531995279660?text=Olá, estou participando da pesquisa e preciso de ajuda.', '_blank');
+  };
+
+  const handleCopyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy address:', err);
+    }
+  };
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(emailAddress);
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy email:', err);
+    }
   };
 
   return (
@@ -188,24 +215,33 @@ export default function InstructionsPage() {
               </div>
               <ol className="space-y-3 list-decimal list-inside">
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">1. Requisitar tokens nativos para gás</span>
+                  <span className="font-medium">1. Realizar um depósito</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">2. Realizar um depósito</span>
-                </li>
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">3. Fazer um swap de USD para WBTC</span>
+                  <span className="font-medium">2. Fazer um swap de USD para WBTC</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
                   <span className="font-medium">
-                    4. Transferir tokens para outra carteira → coloque um endereço arbitrário
+                    3. Transferir tokens para outra carteira → Enviar para{' '}
+                    <button
+                      onClick={handleCopyAddress}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded text-blue-700 font-mono text-sm transition-colors cursor-pointer"
+                      title="Clique para copiar"
+                    >
+                      {walletAddress}
+                      {copied ? (
+                        <Check className="w-3 h-3 text-green-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </button>
                   </span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">5. Retirar tokens da plataforma</span>
+                  <span className="font-medium">4. Retirar tokens da plataforma</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">6. Fazer logout</span>
+                  <span className="font-medium">5. Fazer logout</span>
                 </li>
               </ol>
             </div>
@@ -249,7 +285,19 @@ export default function InstructionsPage() {
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
                   <span className="font-medium">
-                    3. Transferir tokens para outra carteira → coloque um endereço arbitrário
+                    3. Transferir tokens para outra carteira → envie para{' '}
+                    <button
+                      onClick={handleCopyEmail}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded text-blue-700 font-mono text-sm transition-colors cursor-pointer"
+                      title="Clique para copiar"
+                    >
+                      {emailAddress}
+                      {emailCopied ? (
+                        <Check className="w-3 h-3 text-green-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </button>
                   </span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
