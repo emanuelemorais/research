@@ -1,7 +1,5 @@
-import { neon } from '@neondatabase/serverless';
 import { NextRequest } from 'next/server';
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { getDb } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
     try {
@@ -11,6 +9,7 @@ export async function POST(req: NextRequest) {
             return Response.json({ success: false, exists: false }, { status: 400 });
         }
 
+        const sql = getDb();
         const result = await sql.query(
             'SELECT id FROM nasa_tlx_responses WHERE session_id = $1',
             [sessionId]

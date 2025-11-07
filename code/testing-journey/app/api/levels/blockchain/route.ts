@@ -1,9 +1,7 @@
-import { neon } from '@neondatabase/serverless';
-
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { getDb } from '@/lib/db';
 
 export async function GET() {
+  const sql = getDb();
   const result = await sql.query('SELECT * FROM blockchainknowledgelevels');
   return Response.json(result);
 }

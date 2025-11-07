@@ -2,7 +2,13 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, create a `.env.local` file in the root directory and add your Neon database connection string:
+
+```env
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev

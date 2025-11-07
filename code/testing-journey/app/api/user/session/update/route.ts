@@ -1,8 +1,5 @@
-import { neon } from '@neondatabase/serverless';
 import { NextRequest } from 'next/server';
-
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { getDb } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
     try {
@@ -12,6 +9,7 @@ export async function POST(req: NextRequest) {
             return Response.json({ success: false, error: 'Missing userId or platformId' }, { status: 400 });
         }
         
+        const sql = getDb();
         const result = await sql.query(
             `UPDATE Sessions 
              SET endDate = NOW() 

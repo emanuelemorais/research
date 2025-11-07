@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
@@ -22,7 +22,7 @@ interface NASAFormData {
   frustration: number;
 }
 
-export default function NASATLXPage() {
+function NASATLXContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -310,5 +310,23 @@ export default function NASATLXPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NASATLXPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6">
+              <p className="text-center text-gray-600">Carregando...</p>
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <NASATLXContent />
+    </Suspense>
   );
 }
