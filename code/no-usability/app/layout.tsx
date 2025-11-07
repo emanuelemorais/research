@@ -24,9 +24,9 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`font-sans antialiased`}>
         <RainbowKitLayout>
-        {children}
-        <FloatingInstructionsButton />
-        <Analytics />
+          {children}
+          <FloatingInstructionsButton />
+          <Analytics />
         </RainbowKitLayout>
       </body>
     </html>
