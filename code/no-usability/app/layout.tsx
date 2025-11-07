@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import RainbowKitLayout from "@/components/layout/RainbowKitLayout"
 import FloatingInstructionsButton from "@/components/floating-instructions-button"
+import ClarityLayout from "@/components/layout/Clarity"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -23,11 +24,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`font-sans antialiased`}>
-        <RainbowKitLayout>
-          {children}
-          <FloatingInstructionsButton />
-          <Analytics />
-        </RainbowKitLayout>
+        <ClarityLayout>
+          <RainbowKitLayout>
+            {children}
+            <FloatingInstructionsButton />
+            <Analytics />
+          </RainbowKitLayout>
+        </ClarityLayout>
       </body>
     </html>
   )
