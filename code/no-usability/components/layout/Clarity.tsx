@@ -1,18 +1,13 @@
-'use client';
+"use client";
+import Clarity from "@microsoft/clarity";
+import { useEffect } from "react";
 
-import { useEffect } from 'react';
-import Clarity from '@microsoft/clarity';
+export default function ClarityInit() {
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            Clarity.init('u2hv11k2qz');
+        }
+      }, []);
 
-
-export default function ClarityLayout({ children }: { children: React.ReactNode }) {
-
-  useEffect(() => {
-    Clarity.init('u2hv11k2qz');
-  }, []);
-    
-  return (
-    <>
-      {children}
-    </>
-  );
+    return null;
 }
