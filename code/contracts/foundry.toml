@@ -1,0 +1,16 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["dependencies"]
+fs_permissions = [{ access = "read", path = "./" }]
+
+[dependencies]
+forge-std = "1.11.0"
+"@openzeppelin-contracts" = "5.4.0"
+smartcontractkit-chainlink-evm = "1.5.0"
+
+[soldeer]
+remappings_generate = false
+remappings_regenerate = false
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
