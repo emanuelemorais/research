@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { usePrivy } from "@privy-io/react-auth";
-import {useCreateWallet} from '@privy-io/react-auth';
+import { useCreateWallet } from '@privy-io/react-auth';
 import { KeyRound } from 'lucide-react';
 import { useAppContext } from '@/contexts/AppContext';
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
   const { loading, initOAuth } = useLoginWithOAuth();
   const router = useRouter();
   const { ready, authenticated, user } = usePrivy();
-  const {createWallet} = useCreateWallet();
+  const { createWallet } = useCreateWallet();
   const [hasCreatedWallet, setHasCreatedWallet] = useState(false);
   const { sessionId } = useAppContext();
 
@@ -52,19 +52,19 @@ export default function LoginPage() {
   useEffect(() => {
     const maybeCreateWallet = async () => {
       if (!ready || !authenticated || !user || hasCreatedWallet) return;
-  
+
       try {
         setHasCreatedWallet(true);
-  
+
         const hasEmbeddedWallet = user.linkedAccounts.some(
           (acc) =>
             acc.type === 'wallet' &&
             acc.connectorType === 'embedded' &&
             acc.walletClientType === 'privy'
         );
-  
+
         console.log('🔍 Wallet check:', hasEmbeddedWallet);
-  
+
         if (!hasEmbeddedWallet) {
           console.log('⚙️ Creating embedded wallet...');
           const result = await createWallet();
@@ -75,13 +75,13 @@ export default function LoginPage() {
 
         // Salva o clique do botão de login quando o usuário faz login com sucesso
         await saveButtonClick(1); // Login buttonId = 1
-  
+
         router.push('/dashboard');
       } catch (err) {
         console.error('❌ Failed to create wallet:', err);
       }
     };
-  
+
     maybeCreateWallet();
   }, [ready, authenticated, user, router, saveButtonClick]);
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     const fullCode = code.join('');
     if (fullCode.length === 6) {
-      const result = await loginWithCode({ code: fullCode });      
+      const result = await loginWithCode({ code: fullCode });
     }
   };
 
@@ -125,16 +125,16 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
       <Card className="w-full max-w-md bg-white border border-gray-200 shadow-lg">
         <CardHeader className="text-center">
-            <div className="mb-6">
+          <div className="mb-6">
             <div className="w-16 h-16 bg-blue-700 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Wallet className="w-8 h-8 text-primary-foreground" />
+              <Wallet className="w-8 h-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold mb-2">DeFi Platform</h1>
-            </div>
-            <CardTitle className="text-2xl font-semibold tracking-tight text-gray-800">
-                Seja bem-vindo(a)
-            </CardTitle>
-            <p className="text-sm text-gray-500">Faça login ou cadastre-se para continuar</p>
+          </div>
+          <CardTitle className="text-2xl font-semibold tracking-tight text-gray-800">
+            Seja bem-vindo(a)
+          </CardTitle>
+          <p className="text-sm text-gray-500">Faça login ou cadastre-se para continuar</p>
         </CardHeader>
 
         <CardContent className="space-y-6">

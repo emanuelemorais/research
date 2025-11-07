@@ -33,8 +33,8 @@ export default function ConsentPage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h3 className="font-semibold text-blue-900 mb-2">Sobre esta Pesquisa</h3>
               <p className="text-blue-800 text-sm leading-relaxed">
-                Esta é uma pesquisa acadêmica que visa compreender o perfil dos usuários 
-                de plataformas DeFi (Finanças Descentralizadas). Todas as informações coletadas são totalmente anônimas. Não coletamos 
+                Esta é uma pesquisa acadêmica que visa compreender o perfil dos usuários
+                de plataformas DeFi (Finanças Descentralizadas). Todas as informações coletadas são totalmente anônimas. Não coletamos
                 nomes, e-mails ou qualquer informação que permita sua identificação pessoal.
               </p>
             </div>
@@ -50,8 +50,8 @@ export default function ConsentPage() {
                 className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
               />
               <span className="text-sm text-gray-700 group-hover:text-gray-900">
-                Eu concordo em participar desta pesquisa e confirmo que li e compreendi as 
-                informações acima. 
+                Eu concordo em participar desta pesquisa e confirmo que li e compreendi as
+                informações acima.
               </span>
             </label>
           </div>
