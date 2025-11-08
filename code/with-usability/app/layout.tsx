@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/ProviderPrivy";
 import { Toaster } from "@/components/ui/sonner"
-
+import ClarityInit from "@/components/Clarity"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,6 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <ClarityInit />
         <Toaster richColors position="top-right" />
         <Providers> {children} </Providers>
       </body>
