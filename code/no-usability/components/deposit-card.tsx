@@ -27,11 +27,14 @@ export function DepositCard() {
   const { sessionId } = useAppContext();
 
   const tokenAddress = getTokenAddress(selectedToken);
+  console.log("tokenAddress", tokenAddress)
+  console.log("address", address)
   
-  const { data, isLoading, error } = useBalance({
+  const { data: balanceData, isLoading, error } = useBalance({
     address: address as `0x${string}`,
     token: tokenAddress as `0x${string}`,
   });
+  console.log("data", balanceData)
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: tokenAddress as `0x${string}`,
@@ -157,7 +160,7 @@ export function DepositCard() {
           <div className="flex justify-between">
             <Label>Quantidade</Label>
             <span className="text-sm text-muted-foreground">
-              Saldo na carteira: {data?.formatted ? Number(data?.formatted).toFixed(4) : "0.0000"} {selectedToken}
+              Saldo na carteira: {balanceData?.formatted ? Number(balanceData?.formatted).toFixed(4) : "0.0000"} {selectedToken}
             </span>
           </div>
           <div className="relative">
@@ -172,7 +175,7 @@ export function DepositCard() {
               variant="ghost"
               size="sm"
               className="absolute right-2 top-1/2 -translate-y-1/2"
-              onClick={() => setAmount(data?.formatted || "0")}
+              onClick={() => setAmount(balanceData?.formatted || "0")}
             >
               MAX
             </Button>

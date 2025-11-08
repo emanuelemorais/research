@@ -15,7 +15,7 @@ contract DeployVault is Script {
     function run() external {
         console.log("Starting Vault deployment on chain id:", block.chainid);
 
-        address tokenFactoryAddress = 0xf850742E5952b4Cd74eB96034a9725745fE2387C; 
+        address tokenFactoryAddress = 0x1D038D01950B9Ca08553e543D3cEE07FF4171883; 
         
         vm.startBroadcast();
 
@@ -54,12 +54,10 @@ contract DeployVault is Script {
         console.log("=== CONFIGURATIONS COMPLETE ===");
 
         console.log("=== ADD LIQUIDITY TO THE VAULT ===");
-        
-        // vault.addLiquidity{value: 1 ether}(nativeAddress, 1 ether);
-        // console.log("✅ Native ETH liquidity added: 1 ETH");
+
         
         BaseToken wbtcToken = BaseToken(wbtcAddress);
-        uint256 wbtcAmount = 5 * 10**8; // 1 WBTC (8 decimais)
+        uint256 wbtcAmount = 10 * 10**8; // 1 WBTC (8 decimais)
         uint256 wbtcBalance = wbtcToken.balanceOf(msg.sender);
         console.log("WBTC balance:", wbtcBalance);
 
@@ -68,7 +66,7 @@ contract DeployVault is Script {
         console.log("WBTC liquidity added: 1 WBTC");
         
         BaseToken usdToken = BaseToken(usdAddress);
-        uint256 usdAmount = 1000 * 10**18; // 1000 USD (18 decimais)
+        uint256 usdAmount = 10000000 * 10**18; 
         usdToken.approve(address(vault), usdAmount);
         vault.addLiquidity(usdAddress, usdAmount);
         console.log("USD liquidity added: 1000 USD");

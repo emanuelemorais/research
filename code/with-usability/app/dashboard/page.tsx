@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ArrowDownLeft, Send, Repeat, ArrowUpRight, LoaderCircle, Info } from "lucide-react";
 import Link from "next/link";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import ethImage from "@/images/ethereum-eth-logo.svg";
 import btcImage from "@/images/bitcoin-btc-logo.svg";
 import usdImage from "@/images/dolar-usd-logo.svg";
@@ -55,6 +56,8 @@ interface TokenBalance {
 
 const DashboardPage = memo(function DashboardPage() {
   const { user, ready } = usePrivy();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [balances, setBalances] = useState<Record<string, TokenBalance>>({
     
@@ -64,8 +67,7 @@ const DashboardPage = memo(function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchBalances() {
+  const fetchBalances = useCallback(async () => {
       if (!ready || !user) {
         return;
       }
@@ -172,10 +174,28 @@ const DashboardPage = memo(function DashboardPage() {
       } finally {
         setLoading(false);
       }
-    }
-
-    fetchBalances();
   }, [user, ready]);
+
+  useEffect(() => {
+    fetchBalances();
+  }, [fetchBalances]);
+
+  // Se veio de um mint recente, refetch após um delay para garantir que os valores estão atualizados
+  useEffect(() => {
+    const minted = searchParams.get('minted');
+    if (minted === 'true') {
+      // Remove o parâmetro da URL
+      router.replace('/dashboard', { scroll: false });
+      
+      // Aguarda um pouco e refaz o fetch dos saldos para garantir que está atualizado
+      const timeoutId = setTimeout(() => {
+        console.log('🔄 Refazendo fetch dos saldos após mint...');
+        fetchBalances();
+      }, 2000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchParams, router, fetchBalances]);
 
   const formatBalance = (balance: string) => {
     const num = parseFloat(balance);

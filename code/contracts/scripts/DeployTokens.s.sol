@@ -26,7 +26,7 @@ contract DeployTokens is Script {
             "USD",
             "USD", 
             18,
-            1000000 * 10**18  // 1M USD tokens
+            100000000 * 10**18  // 100M USD tokens
         );
         usdToken = BaseToken(usdAddress);
         console.log("USD Token deployed at:", address(usdToken));

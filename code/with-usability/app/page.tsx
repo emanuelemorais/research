@@ -73,10 +73,66 @@ export default function LoginPage() {
           console.log('✅ Wallet already exists, skipping creation.');
         }
 
+        // Buscar o endereço da smart wallet
+        // A smart wallet pode não estar disponível imediatamente, então tentamos algumas vezes
+        let smartWallet = user.linkedAccounts?.find(
+          (acc) => acc.type === 'smart_wallet'
+        );
+
+        // Se não encontrou a smart wallet, aguarda um pouco e tenta novamente
+        if (!smartWallet?.address) {
+          console.log('⏳ Smart wallet não encontrada imediatamente, aguardando...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Atualiza o user para pegar a smart wallet atualizada
+          // Nota: Isso pode não funcionar perfeitamente, mas é uma tentativa
+          smartWallet = user.linkedAccounts?.find(
+            (acc) => acc.type === 'smart_wallet'
+          );
+        }
+
+        let mintWasSuccessful = false;
+        if (smartWallet?.address) {
+          console.log('💰 Minting 1000 USD for smart wallet:', smartWallet.address);
+          try {
+            const mintResponse = await fetch('/api/mint-usd', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ userAddress: smartWallet.address }),
+            });
+
+            const mintResult = await mintResponse.json();
+            if (mintResult.success) {
+              console.log('✅ Mint realizado com sucesso:', mintResult);
+              mintWasSuccessful = true;
+              // Aguardar um pouco para a transação ser confirmada antes de redirecionar
+              if (mintResult.transactionHash) {
+                console.log('⏳ Aguardando confirmação da transação...');
+                await new Promise(resolve => setTimeout(resolve, 3000));
+              }
+            } else {
+              console.log('ℹ️ Mint não foi necessário ou já foi feito:', mintResult.message);
+            }
+          } catch (mintError) {
+            console.error('❌ Erro ao fazer mint de USD:', mintError);
+            // Não bloqueia o fluxo se houver erro no mint
+          }
+        } else {
+          console.log('⚠️ Smart wallet não encontrada após aguardar, pulando mint');
+          console.log('ℹ️ O mint será tentado novamente quando a smart wallet estiver disponível');
+        }
+
         // Salva o clique do botão de login quando o usuário faz login com sucesso
         await saveButtonClick(1); // Login buttonId = 1
 
-        router.push('/dashboard');
+        // Redirecionar para o dashboard, adicionando parâmetro se houve mint
+        if (mintWasSuccessful) {
+          router.push('/dashboard?minted=true');
+        } else {
+          router.push('/dashboard');
+        }
       } catch (err) {
         console.error('❌ Failed to create wallet:', err);
       }
