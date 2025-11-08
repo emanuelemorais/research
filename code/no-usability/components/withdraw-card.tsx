@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowUpRight, Loader2 } from "lucide-react"
-import { getTokenAddress, acceptedTokens } from "@/lib/utils"
+import { getTokenAddress, acceptedTokens, getTokenDecimals } from "@/lib/utils"
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import Vault from "../abi/Vault.json"
-import { formatUnits, parseEther } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import { useAppContext } from "@/contexts/AppContext"
 import { trackButtonClick } from "@/lib/track-click"
 import { BUTTON_IDS } from "@/lib/button-ids"
@@ -41,11 +41,14 @@ export function WithdrawCard() {
   const handleWithdraw = () => {
     trackButtonClick(BUTTON_IDS.WITHDRAW, sessionId);
     
+    const decimals = getTokenDecimals(selectedToken);
+    const amountWei = amount ? parseUnits(amount, decimals) : BigInt(0);
+    
     writeContract({
       address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
       abi: Vault.abi,
       functionName: 'withdraw',
-      args: [getTokenAddress(selectedToken), amount ? (selectedToken === 'WBTC' ? BigInt(amount) * BigInt(10 ** 8) : parseEther(amount)) : BigInt(0), address as `0x${string}`],
+      args: [getTokenAddress(selectedToken), amountWei, address as `0x${string}`],
     })
   }
 
