@@ -193,7 +193,7 @@ export function WithdrawCard() {
               saveButtonClick(3); // Withdraw buttonId = 3
               setOpenWithdrawConfirmationDialog(true);
             }}
-            disabled={(!amount || Number.parseFloat(amount) <= 0) || Number.parseFloat(amount) >= balance || balance === 0 || loading}
+            disabled={(!amount || Number.parseFloat(amount) <= 0) || Number.parseFloat(amount) > balance || balance === 0 || loading}
           >
             {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Aguarde a confirmação...</> : 'Sacar'}
           </Button>
