@@ -143,6 +143,9 @@ export function TransferCard() {
       await saveTaskCompleted(5); // Transfer taskId = 5
       
       await fetchBalance();
+      
+      // Limpar o campo de valor após sucesso
+      setAmount("");
     } catch (error) {
       console.error("Erro ao transferir:", error);
       toast.error("Erro ao realizar transferência");

@@ -141,6 +141,9 @@ export function DepositCard() {
         if (balance !== undefined) {
           setBalance(balance);
         }
+        
+        // Limpar o campo de valor após sucesso
+        setAmount("");
     } finally {
       setLoading(false);
     }
