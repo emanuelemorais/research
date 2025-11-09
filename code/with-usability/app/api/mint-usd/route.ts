@@ -44,38 +44,7 @@ export async function POST(req: NextRequest) {
       transport: http(process.env.NEXT_PUBLIC_ALCHEMY_URL),
     });
 
-    // Verificar saldo atual do usuário
-    const balance = await publicClient.readContract({
-      address: USD_TOKEN_ADDRESS,
-      abi: BaseToken.abi,
-      functionName: 'balanceOf',
-      args: [userAddress as `0x${string}`],
-    }) as bigint;
-
-    // Se já tiver saldo, não precisa fazer mint
-    if (balance && balance > BigInt(0)) {
-      return NextResponse.json({
-        success: true,
-        message: 'Usuário já possui saldo de USD',
-        balance: balance.toString(),
-      });
-    }
-
-    // Verificar novamente o saldo antes de fazer mint (pode ter mudado entre requisições)
-    const balanceBeforeMint = await publicClient.readContract({
-      address: USD_TOKEN_ADDRESS,
-      abi: BaseToken.abi,
-      functionName: 'balanceOf',
-      args: [userAddress as `0x${string}`],
-    }) as bigint;
-
-    if (balanceBeforeMint && balanceBeforeMint > BigInt(0)) {
-      return NextResponse.json({
-        success: true,
-        message: 'Usuário já possui saldo de USD',
-        balance: balanceBeforeMint.toString(),
-      });
-    }
+    // Removida a verificação de saldo - sempre faz mint independente do saldo atual
 
     // Criar wallet client com a chave privada do owner para escrita
     const account = privateKeyToAccount(ownerPrivateKey as `0x${string}`);
