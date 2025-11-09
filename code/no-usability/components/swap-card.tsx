@@ -17,8 +17,8 @@ import { BUTTON_IDS } from "@/lib/button-ids"
 import { trackTaskCompleted } from "@/lib/track-task-completed"
 
 export function SwapCard() {
-  const [fromToken, setFromToken] = useState("ETH")
-  const [toToken, setToToken] = useState("USD")
+  const [fromToken, setFromToken] = useState("USD")
+  const [toToken, setToToken] = useState("WBTC")
   const [fromAmount, setFromAmount] = useState("")
   const [toAmount, setToAmount] = useState("")
   const { address } = useAccount()
@@ -68,7 +68,7 @@ export function SwapCard() {
     },
   })
 
-  const { data: userBalance } = useReadContract({
+  const { data: userBalance, refetch: refetchUserBalance } = useReadContract({
     address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
     abi: Vault.abi,
     functionName: 'balanceOfToken',
@@ -87,6 +87,12 @@ export function SwapCard() {
       enabled: !!toToken,
     },
   })
+
+  useEffect(() => {
+    if (isSwapConfirmed) {
+      refetchUserBalance();
+    }
+  }, [isSwapConfirmed, refetchUserBalance]);
 
   const handleSwap = async () => {
     trackButtonClick(BUTTON_IDS.SWAP, sessionId);

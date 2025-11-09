@@ -18,7 +18,7 @@ import { trackTaskCompleted } from "@/lib/track-task-completed"
 
 
 export function TransferCard() {
-  const [selectedToken, setSelectedToken] = useState("ETH")
+  const [selectedToken, setSelectedToken] = useState("USD")
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
   const { address, isConnected } = useAccount()
@@ -28,16 +28,33 @@ export function TransferCard() {
   const handleTransfer = () => {
     trackButtonClick(BUTTON_IDS.TRANSFER, sessionId);
     
-    const selectedTokenAddress = getTokenAddress(selectedToken);
-    const decimals = getTokenDecimals(selectedToken);
-    const amountWei = amount ? parseUnits(amount, decimals) : BigInt(0)
-   
-    writeContract({
-      address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
-      abi: Vault.abi,
-      functionName: 'transferInternal',
-      args: [selectedTokenAddress, recipient as `0x${string}`, amountWei],
-    })
+    try {
+      const selectedTokenAddress = getTokenAddress(selectedToken);
+      const decimals = getTokenDecimals(selectedToken);
+      
+      // Valida se o número de casas decimais não excede os decimais do token
+      const decimalParts = amount.split('.');
+      if (decimalParts.length > 1 && decimalParts[1].length > decimals) {
+        alert(`O token ${selectedToken} suporta apenas ${decimals} casas decimais. Por favor, ajuste o valor.`);
+        return;
+      }
+      
+      const amountWei = amount ? parseUnits(amount, decimals) : BigInt(0)
+     
+      writeContract({
+        address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
+        abi: Vault.abi,
+        functionName: 'transferInternal',
+        args: [selectedTokenAddress, recipient as `0x${string}`, amountWei],
+      })
+    } catch (error) {
+      console.error("Erro ao transferir:", error);
+      if (error instanceof Error && error.message.includes("fractional component exceeds decimals")) {
+        alert(`O valor informado tem mais casas decimais do que o token ${selectedToken} suporta (${getTokenDecimals(selectedToken)} decimais). Por favor, ajuste o valor.`);
+      } else {
+        alert("Erro ao processar a transferência. Verifique os valores e tente novamente.");
+      }
+    }
   }
 
   const { data: depositBalance, refetch: refetchDepositBalance } = useReadContract({
@@ -105,7 +122,7 @@ export function TransferCard() {
           <div className="flex justify-between">
             <Label>Quantidade</Label>
             <span className="text-sm text-muted-foreground">
-              Saldo:  {depositBalance ? (selectedToken !== 'WBTC' ? Number(formatUnits(depositBalance as bigint, 18)).toFixed(4) : Number(formatUnits(depositBalance as bigint, 8)).toFixed(4)) : "0.0000"} {selectedToken}
+              Saldo:  {depositBalance ? Number(formatUnits(depositBalance as bigint, getTokenDecimals(selectedToken))).toFixed(6) : "0.0000"} {selectedToken}
             </span>
           </div>
           <div className="relative">
@@ -113,14 +130,36 @@ export function TransferCard() {
               type="number"
               placeholder="0.0"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                const decimals = getTokenDecimals(selectedToken);
+                const decimalParts = value.split('.');
+                
+                // Permite apenas o número de casas decimais suportadas pelo token
+                if (decimalParts.length > 1 && decimalParts[1].length > decimals) {
+                  // Limita às casas decimais permitidas
+                  const limitedValue = decimalParts[0] + '.' + decimalParts[1].substring(0, decimals);
+                  setAmount(limitedValue);
+                } else {
+                  setAmount(value);
+                }
+              }}
+              step={10 ** -getTokenDecimals(selectedToken)}
               className="pr-20"
             />
             <Button
               variant="ghost"
               size="sm"
               className="absolute right-2 top-1/2 -translate-y-1/2"
-              onClick={() => setAmount(depositBalance ? (selectedToken !== 'WBTC' ? Number(formatUnits(depositBalance as bigint, 18)).toFixed(4) : Number(formatUnits(depositBalance as bigint, 8)).toFixed(4)) : "0.0000")}
+              onClick={() => {
+                if (depositBalance) {
+                  const decimals = getTokenDecimals(selectedToken);
+                  const balanceFormatted = Number(formatUnits(depositBalance as bigint, decimals)).toFixed(decimals);
+                  setAmount(balanceFormatted);
+                } else {
+                  setAmount("0.0000");
+                }
+              }}
             >
               MAX
             </Button>

@@ -9,18 +9,6 @@ import { memo } from "react";
 const DashboardPage = memo(function DashboardPage() {
   const { address } = useAccount();
 
-  const { data: ethBalance } = useReadContract({
-    address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
-    abi: Vault.abi,
-    functionName: 'balanceOfToken',
-    args: [address!, process.env.NEXT_PUBLIC_NATIVE_ADDRESS as `0x${string}`],
-    query: {
-      enabled: !!address,
-      refetchInterval: 30000, 
-      staleTime: 10000, 
-    },
-  });
-
   const { data: usdBalance } = useReadContract({
     address: process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`,
     abi: Vault.abi,
@@ -56,10 +44,6 @@ const DashboardPage = memo(function DashboardPage() {
       <Card className="p-6">
         <h2 className="text-xl font-semibold mb-4">Saldo depositado</h2>
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">ETH</span>
-            <span className="font-semibold">{ethBalance && typeof ethBalance === 'bigint' ? Number(formatEther(ethBalance)) : "0.0000"} ETH</span>
-          </div>
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">USD</span>
             <span className="font-semibold">{usdBalance && typeof usdBalance === 'bigint' ? Number(formatUnits(usdBalance, 18)) : "0.0000"} USD</span>

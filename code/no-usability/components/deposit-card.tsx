@@ -19,7 +19,7 @@ import { trackTaskCompleted } from "@/lib/track-task-completed"
 
 
 export function DepositCard() {
-  const [selectedToken, setSelectedToken] = useState("ETH")
+  const [selectedToken, setSelectedToken] = useState("USD")
   const [amount, setAmount] = useState("")
   const { address, isConnected } = useAccount()
   const { writeContract: writeApprove, data: approveHash } = useWriteContract();
@@ -27,14 +27,11 @@ export function DepositCard() {
   const { sessionId } = useAppContext();
 
   const tokenAddress = getTokenAddress(selectedToken);
-  console.log("tokenAddress", tokenAddress)
-  console.log("address", address)
   
-  const { data: balanceData, isLoading, error } = useBalance({
+  const { data: balanceData, isLoading, error, refetch: refetchBalance } = useBalance({
     address: address as `0x${string}`,
     token: tokenAddress as `0x${string}`,
   });
-  console.log("data", balanceData)
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: tokenAddress as `0x${string}`,
@@ -50,16 +47,21 @@ export function DepositCard() {
     hash: approveHash,
   });
 
-  const { isSuccess: isDepositConfirmed } = useWaitForTransactionReceipt({
+  const { isSuccess: isDepositConfirmed, status: depositStatus, isLoading: isLoadingDeposit } = useWaitForTransactionReceipt({
     hash: depositHash,
   });
+
+
+  useEffect(() => {
+    if (isDepositConfirmed) {
+      refetchBalance();
+    }
+  }, [isDepositConfirmed, refetchBalance]);
 
   useEffect(() => {
     if (isApproveConfirmed) {
       refetchAllowance();
     }
-    console.log("status after", status)
-    console.log("isLoadingApprove after", isLoadingApprove)
   }, [isApproveConfirmed, refetchAllowance]);
 
   // Rastreia quando o depósito é confirmado com sucesso
@@ -181,6 +183,15 @@ export function DepositCard() {
             </Button>
           </div>
         </div>
+
+        {isLoadingDeposit === true && (
+          <div>
+            <div className="w-full p-3 bg-yellow-100 border border-yellow-300 rounded text-yellow-700 text-sm text-center flex items-center justify-center">
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            Aguarde a confirmação...
+            </div>
+          </div>
+        )}
 
         {isLoadingApprove === true && (
           <div>
