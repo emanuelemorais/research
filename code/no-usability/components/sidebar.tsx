@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/swap", label: "Trocar", icon: Repeat },
   { href: "/dashboard/deposit", label: "Depositar", icon: ArrowDownLeft },
+  { href: "/dashboard/swap", label: "Trocar", icon: Repeat },
   { href: "/dashboard/transfer", label: "Transferir", icon: Send },
   { href: "/dashboard/withdraw", label: "Sacar", icon: ArrowUpRight },
 ]
