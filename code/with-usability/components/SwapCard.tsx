@@ -157,15 +157,14 @@ export function SwapCard() {
       }
     );
 
-    await fetchBalance();
-    toast.success("Troca realizada com sucesso!");
-    
-    // Salva a tarefa como concluída após sucesso
-    await saveTaskCompleted(4); // Swap taskId = 4
-    
-    // Limpar os campos de valor após sucesso
     setFromAmount("");
     setToAmount("");
+
+    await fetchBalance();
+    toast.success("Troca realizada com sucesso!");
+
+    await saveTaskCompleted(4);
+     
   } catch (error) {
     console.error("Erro ao realizar troca:", error);
     toast.error("Erro ao realizar troca");
