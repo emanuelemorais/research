@@ -21,7 +21,7 @@ import { useAppContext } from "@/contexts/AppContext"
 export function TransferCard() {
   const [email, setEmail] = useState("")
   const [amount, setAmount] = useState("")
-  const [selectedToken, setSelectedToken] = useState<keyof typeof TOKEN_ADDRESSES>("ETH")
+  const [selectedToken, setSelectedToken] = useState<keyof typeof TOKEN_ADDRESSES>("USD")
   const [balance, setBalance] = useState<number>(0)
   const [showDialog, setShowDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -163,6 +163,13 @@ export function TransferCard() {
     fetchBalance();
   }, [selectedToken, wallet])
 
+  // Validação de saldo insuficiente
+  useEffect(() => {
+    if (amount && Number.parseFloat(amount) > balance) {
+      toast.error(`Saldo insuficiente. Você possui ${balance.toFixed(4)} ${selectedToken} disponível.`);
+    }
+  }, [amount, balance, selectedToken])
+
   return (
     <>
     <TransferConfirmationDialog
@@ -228,7 +235,9 @@ export function TransferCard() {
               placeholder="0.0"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="pr-20"
+              className={`pr-20 ${
+                amount && Number.parseFloat(amount) > balance ? 'border-red-500 bg-red-50' : ''
+              }`}
             />
             <Button
               variant="ghost"
@@ -242,13 +251,19 @@ export function TransferCard() {
         </div>
 
         <Button
-          className="w-full bg-blue-700 hover:bg-blue-600 text-white cursor-pointer"
+          className="w-full bg-blue-700 hover:bg-blue-600 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           size="lg"
           onClick={() => {
             saveButtonClick(5); // Transfer buttonId = 5
             handleResolveAndShowDialog();
           }}
-          disabled={!email || !amount || Number.parseFloat(amount) <= 0 || isLoading}
+          disabled={
+            !email || 
+            !amount || 
+            Number.parseFloat(amount) <= 0 || 
+            Number.parseFloat(amount) > balance || 
+            isLoading
+          }
         >
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : "Transferir"}
         </Button>

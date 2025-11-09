@@ -20,7 +20,7 @@ import { acceptedTokens, TOKEN_ADDRESSES, handleDecimals, handleBalanceOnContrac
 import { useAppContext } from "@/contexts/AppContext"
 
 export function WithdrawCard() {
-  const [selectedToken, setSelectedToken] = useState<keyof typeof TOKEN_ADDRESSES>("ETH")
+  const [selectedToken, setSelectedToken] = useState<keyof typeof TOKEN_ADDRESSES>("USD")
   const [amount, setAmount] = useState("")
   const [balance, setBalance] = useState<number>(0)
   const [openWithdrawConfirmationDialog, setOpenWithdrawConfirmationDialog] = useState(false)

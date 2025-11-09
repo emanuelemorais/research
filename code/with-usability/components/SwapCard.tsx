@@ -89,12 +89,14 @@ export function SwapCard() {
     fetchBalance();
   }, [fromToken, wallet])
 
+  // Validação de saldo insuficiente
   useEffect(() => {
     if (fromAmount && Number(fromAmount) > fromBalance) {
-      toast.error(`Saldo insuficiente. Você possui ${fromBalance.toFixed(4)} ${fromToken}`);
-      return;
+      toast.error(`Saldo insuficiente. Você possui ${fromBalance.toFixed(4)} ${fromToken} depositado.`);
     }
-    
+  }, [fromAmount, fromBalance, fromToken])
+
+  useEffect(() => {
     const fetchExchangeRate = async () => {
       if (fromAmount && Number(fromAmount) > 0) {
         const rate = await handleGetExchangeRate(fromAmount, fromToken, toToken);
@@ -116,6 +118,13 @@ export function SwapCard() {
     fetchLiquidity();
     fetchExchangeRate();
   }, [fromAmount, fromBalance, fromToken, toToken])
+
+  // Validação de liquidez
+  useEffect(() => {
+    if (exchangeRate !== null && liquidity !== null && exchangeRate > liquidity) {
+      toast.error(`Liquidez insuficiente. Disponível: ${liquidity.toFixed(6)} ${toToken}, necessário: ${exchangeRate.toFixed(6)} ${toToken}`);
+    }
+  }, [exchangeRate, liquidity, toToken])
 
   const handleSwap = async () => {
     try{
@@ -263,11 +272,15 @@ export function SwapCard() {
                   disabled={true}
                   value={exchangeRate !== null ? exchangeRate.toString() : ""}
                   onChange={(e) => setToAmount(e.target.value)}
+                  placeholder="0.0"
                   className="text-right text-2xl font-semibold border-0 bg-transparent px-4 py-2 h-auto focus-visible:ring-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
               </div>
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>Liquidez: {liquidity !== null ? liquidity.toString() : "0.0000"}</span>
+                {exchangeRate !== null && liquidity !== null && exchangeRate > liquidity && (
+                  <span className="text-red-600 font-medium">Liquidez insuficiente</span>
+                )}
               </div>
             </Card>
           </div>
@@ -291,7 +304,13 @@ export function SwapCard() {
             saveButtonClick(4); // Swap buttonId = 4
             setOpenSwapConfirmationDialog(true);
           }}
-          disabled={!fromAmount || Number(fromAmount) <= 0 || Number(fromAmount) > fromBalance || loading}
+          disabled={
+            !fromAmount || 
+            Number(fromAmount) <= 0 || 
+            Number(fromAmount) > fromBalance || 
+            loading ||
+            (exchangeRate !== null && liquidity !== null && exchangeRate > liquidity)
+          }
         >
           {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Aguarde a confirmação...</> : 'Realizar Troca'}
         </Button>

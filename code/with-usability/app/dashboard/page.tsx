@@ -200,8 +200,8 @@ const DashboardPage = memo(function DashboardPage() {
   const formatBalance = (balance: string) => {
     const num = parseFloat(balance);
     if (num === 0) return "0";
-    if (num < 0.0001) return "< 0.0001";
-    return num.toFixed(4);
+    if (num < 0.000001) return "< 0.000001";
+    return num.toFixed(6);
   };
 
   return (
@@ -259,16 +259,6 @@ const DashboardPage = memo(function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* ETH */}
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="flex items-center gap-2 text-gray-600 font-medium">
-                  <img src={ethImage.src} alt="ETH" className="w-8 h-8" />
-                  ETH
-                </span>
-                <span className="font-semibold text-gray-900">
-                  {formatBalance(balances.ETH.deposited)} ETH
-                </span>
-              </div>
 
               {/* USD */}
               <div className="flex items-center justify-between border-b border-gray-200 pb-2">
@@ -317,16 +307,6 @@ const DashboardPage = memo(function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* ETH */}
-              <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                <span className="flex items-center gap-2 text-gray-600 font-medium">
-                  <img src={ethImage.src} alt="ETH" className="w-8 h-8" />
-                  ETH
-                </span>
-                <span className="font-semibold text-gray-900">
-                  {formatBalance(balances.ETH.wallet)} ETH
-                </span>
-              </div>
 
               {/* USD */}
               <div className="flex items-center justify-between border-b border-gray-200 pb-2">

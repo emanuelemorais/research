@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils"
 
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/swap", label: "Swap", icon: Repeat },
-  { href: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
-  { href: "/dashboard/transfer", label: "Transfer", icon: Send },
-  { href: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
+  { href: "/dashboard/swap", label: "Trocar", icon: Repeat },
+  { href: "/dashboard/deposit", label: "Depositar", icon: ArrowDownLeft },
+  { href: "/dashboard/transfer", label: "Transferir", icon: Send },
+  { href: "/dashboard/withdraw", label: "Sacar", icon: ArrowUpRight },
 ]
 
 export function Sidebar() {

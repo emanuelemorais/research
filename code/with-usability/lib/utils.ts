@@ -20,20 +20,18 @@ export function getPublicClient() {
 }
 
 export const acceptedTokens = [
-  { symbol: "ETH", name: "Ether", image: ethImage },
   { symbol: "WBTC", name: "WBitcoin", image: btcImage },
-  { symbol: "USD", name: "USD", image: usdImage },
-];
+  { symbol: "USD", name: "USD", image: usdImage }
+]
 
 export const TOKEN_ADDRESSES = {
-  ETH: process.env.NEXT_PUBLIC_NATIVE_ADDRESS as `0x${string}` | undefined,
   USD: process.env.NEXT_PUBLIC_USD_TOKEN_ADDRESS as `0x${string}` | undefined,
   WBTC: process.env.NEXT_PUBLIC_WBTC_TOKEN_ADDRESS as `0x${string}` | undefined,
 };
 
 export const handleDecimals = async (tokenAddress: `0x${string}`) => {
 
-  if (tokenAddress === TOKEN_ADDRESSES.ETH) return 18;
+  //if (tokenAddress === TOKEN_ADDRESSES.ETH) return 18;
   
   const publicClient = getPublicClient();
 
@@ -50,13 +48,13 @@ export const handleBalanceOnChain = async (wallet: `0x${string}`, selectedToken:
 
   const publicClient = getPublicClient();
 
-  if (selectedToken === "ETH") {
-    console.log("ETH")
-    const saldo = await publicClient.getBalance({
-      address: wallet,
-    });
-    return Number(formatUnits(saldo, 18))
-  }
+  // if (selectedToken === "ETH") {
+  //   console.log("ETH")
+  //   const saldo = await publicClient.getBalance({
+  //     address: wallet,
+  //   });
+  //   return Number(formatUnits(saldo, 18))
+  // }
 
   const tokenAddress = TOKEN_ADDRESSES[selectedToken];
   if (!tokenAddress) return 0;

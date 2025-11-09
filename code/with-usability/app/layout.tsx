@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/components/ProviderPrivy";
 import { Toaster } from "@/components/ui/sonner"
 import ClarityInit from "@/components/Clarity"
+import FloatingInstructionsButton from "@/components/FloatingInstructions";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,7 +32,10 @@ export default function RootLayout({
       >
         <ClarityInit />
         <Toaster richColors position="top-right" />
-        <Providers> {children} </Providers>
+        <Providers> 
+          {children} 
+        </Providers>
+        <FloatingInstructionsButton />
       </body>
     </html>
   );

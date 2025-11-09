@@ -21,7 +21,7 @@ import { acceptedTokens, getPublicClient, TOKEN_ADDRESSES, handleBalanceOnChain,
 import { useAppContext } from "@/contexts/AppContext"
 
 export function DepositCard() {
-  const [selectedToken, setSelectedToken] = useState<keyof typeof TOKEN_ADDRESSES>("ETH")
+  const [selectedToken, setSelectedToken] = useState<keyof typeof TOKEN_ADDRESSES>("USD")
   const [amount, setAmount] = useState("")
   const [balance, setBalance] = useState<number>(0)
   const [loading, setLoading] = useState(false)
@@ -78,18 +78,18 @@ export function DepositCard() {
     const publicClient = getPublicClient();
     let decimals = 18;
 
-    if (selectedToken !== "ETH") {
-      try {
-        decimals = await publicClient.readContract({
-          address: tokenAddress,
-          abi: BaseToken.abi,
-          functionName: "decimals",
-        }) as number;
-      } catch (error) {
-        console.error("Erro ao buscar decimais do token:", error);
-        throw error;
-      }
-    }
+    // if (selectedToken !== "ETH") {
+    //   try {
+    //     decimals = await publicClient.readContract({
+    //       address: tokenAddress,
+    //       abi: BaseToken.abi,
+    //       functionName: "decimals",
+    //     }) as number;
+    //   } catch (error) {
+    //     console.error("Erro ao buscar decimais do token:", error);
+    //     throw error;
+    //   }
+    // }
 
     const amountFormatted = parseUnits(amount, decimals);
 
@@ -157,6 +157,13 @@ export function DepositCard() {
     fetchBalance();
   }, [selectedToken, wallet])
 
+  // Validação de saldo insuficiente
+  useEffect(() => {
+    if (amount && Number(amount) > balance) {
+      toast.error(`Saldo insuficiente. Você possui ${balance.toFixed(4)} ${selectedToken} na carteira.`);
+    }
+  }, [amount, balance, selectedToken])
+
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
@@ -219,7 +226,9 @@ export function DepositCard() {
                 placeholder="0.0"
                 value={amount}
                 onChange={handleAmountChange}
-                className="pr-20"
+                className={`pr-20 ${
+                  amount && Number.parseFloat(amount) > balance ? 'border-red-500 bg-red-50' : ''
+                }`}
               />
               <Button
                 variant="ghost"
@@ -243,13 +252,18 @@ export function DepositCard() {
 
 
           <Button
-            className="w-full bg-blue-700 cursor-pointer hover:bg-blue-600"
+            className="w-full bg-blue-700 cursor-pointer hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             size="lg"
             onClick={() => {
               saveButtonClick(2); // Deposit buttonId = 2
               setShowDialog(true);
             }}
-            disabled={!amount || Number(amount) <= 0 || loading}
+            disabled={
+              !amount || 
+              Number(amount) <= 0 || 
+              Number.parseFloat(amount) > balance || 
+              loading
+            }
           >
             {loading ?
               <>
