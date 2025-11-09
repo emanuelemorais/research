@@ -15,8 +15,8 @@ export const getTokenAddress = (token: string) => {
 };
 
 export const acceptedTokens = [
-  { symbol: "WBTC", name: "WBitcoin" },
-  { symbol: "USD", name: "USD" },
+  { symbol: "WBTC", name: "Wrapped Bitcoin" },
+  { symbol: "USD", name: "Dolar Americano" },
 ]
 
 export const getTokenDecimals = (token: string) => {

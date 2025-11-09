@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowDownUp, Loader2, Settings } from "lucide-react"
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { getTokenAddress, acceptedTokens, getTokenDecimals } from "@/lib/utils"
+import { getTokenAddress, getTokenDecimals } from "@/lib/utils"
 import Vault from "../abi/Vault.json"
 import { formatUnits, parseUnits } from "viem"
 import { useAppContext } from "@/contexts/AppContext"
@@ -123,20 +122,9 @@ export function SwapCard() {
         <div className="relative">
           <Card className="p-4 bg-muted/50 border-2 hover:border-primary/50 transition-colors">
             <div className="flex items-center justify-around mb-2">
-              <Select value={fromToken} onValueChange={setFromToken}>
-                <SelectTrigger className="w-[140px] border-0 bg-transparent p-0 h-auto font-semibold text-lg">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {acceptedTokens.filter((t) => t.symbol !== toToken).map((token) => (
-                    <SelectItem key={token.symbol} value={token.symbol}>
-                      <div className="flex items-center gap-2 px-2">
-                        <span>{token.symbol}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="w-[140px] font-semibold text-lg">
+                {fromToken}
+              </div>
               <Input
                 type="number"
                 placeholder="0.0"
@@ -176,25 +164,13 @@ export function SwapCard() {
         <div className="relative">
           <Card className="p-4 bg-muted/50 border-2 hover:border-primary/50 transition-colors">
             <div className="flex items-center justify-around mb-2">
-              <Select value={toToken} onValueChange={setToToken}>
-                <SelectTrigger className="w-[140px] border-0 bg-transparent p-0 h-auto font-semibold text-lg">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {acceptedTokens.filter((t) => t.symbol !== fromToken).map((token) => (
-                    <SelectItem key={token.symbol} value={token.symbol}>
-                      <div className="flex items-center gap-2 px-2">
-                        <span>{token.symbol}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="w-[140px] font-semibold text-lg">
+                {toToken}
+              </div>
               <Input
                 type="number"
-                disabled={false}
+                disabled={true}
                 value={exchangeAmount ? Number(formatUnits(exchangeAmount as bigint, getTokenDecimals(toToken))).toFixed(8) : "0.0000"}
-                onChange={(e) => setToAmount(e.target.value)}
                 className="text-right text-2xl font-semibold border-0 bg-transparent px-4 h-auto focus-visible:ring-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
