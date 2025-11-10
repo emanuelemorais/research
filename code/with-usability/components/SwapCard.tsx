@@ -224,7 +224,7 @@ export function SwapCard() {
                       setFromAmount(value);
                     }
                   }}
-                  className={`text-right text-2xl font-semibold border-0 bg-transparent px-4 py-2 h-auto focus-visible:ring-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] ${
+                  className={`border-1 border-gray-300 text-right text-2xl font-semibold bg-transparent px-4 py-2 h-auto focus-visible:ring-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield] ${
                     fromAmount && Number(fromAmount) > fromBalance ? 'text-red-600 border-red-600 bg-red-50' : ''
                   }`}
                 />
@@ -274,7 +274,7 @@ export function SwapCard() {
                   value={exchangeRate !== null ? exchangeRate.toString() : ""}
                   onChange={(e) => setToAmount(e.target.value)}
                   placeholder="0.0"
-                  className="text-right text-2xl font-semibold border-0 bg-transparent px-4 py-2 h-auto focus-visible:ring-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                  className="border-1 border-gray-300 text-right text-2xl font-semibold bg-transparent px-4 py-2 h-auto focus-visible:ring-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
               </div>
               <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -292,7 +292,7 @@ export function SwapCard() {
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Valor do câmbio</span>
               <span className="font-medium">
-                1 {fromToken} ≈ {exchangeRate !== null ? (exchangeRate / Number(fromAmount)).toFixed(6) : "Calculando..."} {toToken}
+                1 {fromToken} ≈ {exchangeRate !== null ? (exchangeRate / Number(fromAmount)).toFixed(10) : "Calculando..."} {toToken}
               </span>
             </div>
           </div>

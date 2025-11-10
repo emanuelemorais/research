@@ -11,15 +11,15 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
 
 interface NASAFormData {
-  mentalDemand: number;
-  physicalDemand: number;
-  temporalDemand: number;
-  performance: number;
-  effort: number;
-  frustration: number;
+  mentalDemand: number | null;
+  physicalDemand: number | null;
+  temporalDemand: number | null;
+  performance: number | null;
+  effort: number | null;
+  frustration: number | null;
 }
 
 function NASATLXContent() {
@@ -29,12 +29,12 @@ function NASATLXContent() {
   const [userId, setUserId] = useState<number | null>(null);
   const [platformName, setPlatformName] = useState<string>('Plataforma');
   const [formData, setFormData] = useState<NASAFormData>({
-    mentalDemand: 50,
-    physicalDemand: 50,
-    temporalDemand: 50,
-    performance: 50,
-    effort: 50,
-    frustration: 50,
+    mentalDemand: null,
+    physicalDemand: null,
+    temporalDemand: null,
+    performance: null,
+    effort: null,
+    frustration: null,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -77,7 +77,7 @@ function NASATLXContent() {
     setLoading(false);
   }, [searchParams]);
 
-  const updateFormData = (field: keyof NASAFormData, value: number) => {
+  const updateFormData = (field: keyof NASAFormData, value: number | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -138,17 +138,17 @@ function NASATLXContent() {
     );
   }
 
-  if (!sessionId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <p className="text-center text-red-600">Erro: Session ID não encontrado. Por favor, volte à página anterior.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // if (!sessionId) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4">
+  //       <Card className="w-full max-w-md">
+  //         <CardContent className="pt-6">
+  //           <p className="text-center text-red-600">Erro: Session ID não encontrado. Por favor, volte à página anterior.</p>
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   );
+  // }
 
 
   const SliderComponent = ({
@@ -159,14 +159,45 @@ function NASATLXContent() {
   }: {
     label: string;
     description: string;
-    value: number;
-    onCommit: (value: number) => void;
+    value: number | null;
+    onCommit: (value: number | null) => void;
   }) => {
-    const [internal, setInternal] = useState<number[]>([value]);
+    const [internal, setInternal] = useState<string>(value === null ? '' : value.toString());
 
     useEffect(() => {
-      setInternal([value]);
+      setInternal(value === null ? '' : value.toString());
     }, [value]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const inputValue = e.target.value;
+      setInternal(inputValue);
+      
+      if (inputValue === '') {
+        onCommit(null);
+        return;
+      }
+      
+      const numValue = Number.parseFloat(inputValue);
+      if (!Number.isNaN(numValue) && numValue >= 0 && numValue <= 100) {
+        onCommit(numValue);
+      }
+    };
+
+    const handleBlur = () => {
+      if (internal === '') {
+        onCommit(null);
+        return;
+      }
+      
+      const numValue = Number.parseFloat(internal);
+      if (Number.isNaN(numValue) || numValue < 0) {
+        setInternal('');
+        onCommit(null);
+      } else if (numValue > 100) {
+        setInternal('100');
+        onCommit(100);
+      }
+    };
 
     return (
       <div className="space-y-2">
@@ -175,33 +206,21 @@ function NASATLXContent() {
           <p className="text-sm text-gray-600 mt-1">{description}</p>
         </div>
         <div className="space-y-3">
-          <div className="relative py-3">
-            <Slider
-              aria-label={label}
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
+              0 (Muito baixo)
+            </span>
+            <Input
+              type="number"
               min={0}
               max={100}
               step={1}
               value={internal}
-              onValueChange={(vals) => {
-                // atualiza continuamente durante o arraste
-                setInternal(vals);
-              }}
-              onValueCommit={(vals) => {
-                // só aqui comunica pro pai (suave e sem “pulos”)
-                onCommit(vals[0]);
-              }}
-              orientation="horizontal"
-              className="w-full cursor-pointer touch-none select-none"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className="text-center text-2xl font-bold text-blue-600 bg-blue-50 px-4 py-2 w-32"
             />
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-gray-600 font-medium">
-              0 (Muito baixo)
-            </span>
-            <span className="text-2xl font-bold text-blue-600 min-w-[4rem] text-center bg-blue-50 px-3 py-1 rounded-lg">
-              {internal[0]}
-            </span>
-            <span className="text-xs text-gray-600 font-medium">
+            <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
               100 (Muito alto)
             </span>
           </div>
@@ -217,7 +236,7 @@ function NASATLXContent() {
   }: {
     title: string;
     data: NASAFormData;
-    onUpdate: (field: keyof NASAFormData, value: number) => void;
+    onUpdate: (field: keyof NASAFormData, value: number | null) => void;
   }) => (
     <Card className="w-full">
       <CardHeader>
