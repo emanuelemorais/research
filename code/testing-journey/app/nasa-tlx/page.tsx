@@ -234,37 +234,37 @@ function NASATLXContent() {
       <CardContent className="space-y-6">
         <SliderComponent
           label="1. Exigência Mental (Mental Demand)"
-          description="Quanto esforço mental e concentração foram necessários para usar a plataforma?"
+          description="Quanto esforço mental e concentração foram necessários para usar a plataforma? (Ex.: pensar, decidir, lembrar, compreender o que estava acontecendo)"
           value={data.mentalDemand}
           onCommit={(v) => onUpdate('mentalDemand', v)}
         />
         <SliderComponent
           label="2. Exigência Física (Physical Demand)"
-          description="Quanto esforço físico foi necessário?"
+          description="Quanto esforço físico (cliques, digitação, movimentação) foi necessário para completar as ações?"
           value={data.physicalDemand}
           onCommit={(v) => onUpdate('physicalDemand', v)}
         />
         <SliderComponent
           label="3. Exigência Temporal (Temporal Demand)"
-          description="Quão pressionado(a) pelo tempo você se sentiu?"
+          description="Quão pressionado(a) pelo tempo você se sentiu durante o uso da plataforma?"
           value={data.temporalDemand}
           onCommit={(v) => onUpdate('temporalDemand', v)}
         />
         <SliderComponent
           label="4. Desempenho (Performance)"
-          description="Quão satisfeito(a) você ficou com o seu desempenho?"
+          description="Quão satisfeito(a) você ficou com o seu desempenho geral na plataforma? (0 = Fracasso total / 100 = Sucesso total)"
           value={data.performance}
           onCommit={(v) => onUpdate('performance', v)}
         />
         <SliderComponent
           label="5. Esforço (Effort)"
-          description="Quanto esforço total você precisou fazer?"
+          description="Quanto esforço total você precisou fazer para usar a plataforma com sucesso?"
           value={data.effort}
           onCommit={(v) => onUpdate('effort', v)}
         />
         <SliderComponent
           label="6. Frustração (Frustration Level)"
-          description="Quão irritado(a) ou frustrado(a) você se sentiu?"
+          description="Quão irritado(a), inseguro(a), estressado(a) ou frustrado(a) você se sentiu durante o uso da plataforma?"
           value={data.frustration}
           onCommit={(v) => onUpdate('frustration', v)}
         />
