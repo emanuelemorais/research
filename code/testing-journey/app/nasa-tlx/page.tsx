@@ -101,13 +101,8 @@ function NASATLXContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          sessionId: sessionId,
-          mentalDemand: formData.mentalDemand,
-          physicalDemand: formData.physicalDemand,
-          temporalDemand: formData.temporalDemand,
-          performance: formData.performance,
-          effort: formData.effort,
-          frustration: formData.frustration,
+          sessionId,
+          ...formData,
         }),
       });
 
@@ -138,19 +133,19 @@ function NASATLXContent() {
     );
   }
 
-  // if (!sessionId) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4">
-  //       <Card className="w-full max-w-md">
-  //         <CardContent className="pt-6">
-  //           <p className="text-center text-red-600">Erro: Session ID não encontrado. Por favor, volte à página anterior.</p>
-  //         </CardContent>
-  //       </Card>
-  //     </div>
-  //   );
-  // }
+  if (!sessionId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <p className="text-center text-red-600">Erro: Session ID não encontrado. Por favor, volte à página anterior.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-
+  // 🔧 Corrigido: O valor interno é mantido no estado local e só é confirmado no blur
   const SliderComponent = ({
     label,
     description,
@@ -162,25 +157,18 @@ function NASATLXContent() {
     value: number | null;
     onCommit: (value: number | null) => void;
   }) => {
-    const [internal, setInternal] = useState<string>(value === null ? '' : value.toString());
+    const [internal, setInternal] = useState<string>(value?.toString() ?? '');
 
     useEffect(() => {
-      setInternal(value === null ? '' : value.toString());
+      if (value !== null && value.toString() !== internal) {
+        setInternal(value.toString());
+      }
     }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value;
+      // Permite digitar livremente
       setInternal(inputValue);
-      
-      if (inputValue === '') {
-        onCommit(null);
-        return;
-      }
-      
-      const numValue = Number.parseFloat(inputValue);
-      if (!Number.isNaN(numValue) && numValue >= 0 && numValue <= 100) {
-        onCommit(numValue);
-      }
     };
 
     const handleBlur = () => {
@@ -188,14 +176,15 @@ function NASATLXContent() {
         onCommit(null);
         return;
       }
-      
-      const numValue = Number.parseFloat(internal);
-      if (Number.isNaN(numValue) || numValue < 0) {
+      const numValue = Number(internal);
+      if (isNaN(numValue) || numValue < 0) {
         setInternal('');
         onCommit(null);
       } else if (numValue > 100) {
         setInternal('100');
         onCommit(100);
+      } else {
+        onCommit(numValue);
       }
     };
 
@@ -245,37 +234,37 @@ function NASATLXContent() {
       <CardContent className="space-y-6">
         <SliderComponent
           label="1. Exigência Mental (Mental Demand)"
-          description="Quanto esforço mental e concentração foram necessários para usar a plataforma? (Ex.: pensar, decidir, lembrar, compreender o que estava acontecendo)"
+          description="Quanto esforço mental e concentração foram necessários para usar a plataforma?"
           value={data.mentalDemand}
           onCommit={(v) => onUpdate('mentalDemand', v)}
         />
         <SliderComponent
           label="2. Exigência Física (Physical Demand)"
-          description="Quanto esforço físico (cliques, digitação, movimentação) foi necessário para completar as ações?"
+          description="Quanto esforço físico foi necessário?"
           value={data.physicalDemand}
           onCommit={(v) => onUpdate('physicalDemand', v)}
         />
         <SliderComponent
           label="3. Exigência Temporal (Temporal Demand)"
-          description="Quão pressionado(a) pelo tempo você se sentiu durante o uso da plataforma?"
+          description="Quão pressionado(a) pelo tempo você se sentiu?"
           value={data.temporalDemand}
           onCommit={(v) => onUpdate('temporalDemand', v)}
         />
         <SliderComponent
           label="4. Desempenho (Performance)"
-          description="Quão satisfeito(a) você ficou com o seu desempenho geral na plataforma? (0 = Fracasso total / 100 = Sucesso total)"
+          description="Quão satisfeito(a) você ficou com o seu desempenho?"
           value={data.performance}
           onCommit={(v) => onUpdate('performance', v)}
         />
         <SliderComponent
           label="5. Esforço (Effort)"
-          description="Quanto esforço total você precisou fazer para usar a plataforma com sucesso?"
+          description="Quanto esforço total você precisou fazer?"
           value={data.effort}
           onCommit={(v) => onUpdate('effort', v)}
         />
         <SliderComponent
           label="6. Frustração (Frustration Level)"
-          description="Quão irritado(a), inseguro(a), estressado(a) ou frustrado(a) você se sentiu durante o uso da plataforma?"
+          description="Quão irritado(a) ou frustrado(a) você se sentiu?"
           value={data.frustration}
           onCommit={(v) => onUpdate('frustration', v)}
         />
@@ -292,30 +281,12 @@ function NASATLXContent() {
               Avaliação NASA TLX
             </CardTitle>
             <CardDescription className="text-lg text-center">
-              Agora que você concluiu todas as tarefas nas plataformas (login, depósito, swap, transferência e saque), queremos saber como foi sua experiência geral.
+              Avalie o quanto cada aspecto descreve o esforço e a experiência que você teve.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-base text-gray-800">
-                <strong>Instruções:</strong> Avalie o quanto cada aspecto abaixo descreve o esforço e a experiência que você teve no uso da plataforma como um todo.
-              </p>
-              <p className="text-base text-gray-800 mt-2">
-                Marque um valor de <strong>0 a 100</strong>, onde:
-              </p>
-              <ul className="list-disc list-inside text-base text-gray-800 mt-2 space-y-1">
-                <li><strong>0</strong> significa &quot;muito baixo&quot;</li>
-                <li><strong>100</strong> significa &quot;muito alto&quot;</li>
-              </ul>
-            </div>
-          </CardContent>
         </Card>
 
-        <FormSection
-          title={`Avaliação`}
-          data={formData}
-          onUpdate={updateFormData}
-        />
+        <FormSection title="Avaliação" data={formData} onUpdate={updateFormData} />
 
         <div className="flex justify-center pt-4">
           <Button
