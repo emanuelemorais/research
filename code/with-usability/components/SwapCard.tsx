@@ -48,7 +48,6 @@ export function SwapCard() {
       });
     } catch (error) {
       console.error("Error saving button click:", error);
-      // Não bloqueia a funcionalidade se houver erro ao salvar o clique
     }
   };
 
@@ -241,8 +240,9 @@ export function SwapCard() {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full h-10 w-10 bg-background border-4 border-background hover:bg-muted"
+            className="rounded-full h-10 w-10 bg-background border-4 border-background hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleSwapTokens}
+            disabled={loading}
           >
             <ArrowDownUp className="h-4 w-4" />
           </Button>

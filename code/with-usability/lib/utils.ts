@@ -20,8 +20,8 @@ export function getPublicClient() {
 }
 
 export const acceptedTokens = [
-  { symbol: "WBTC", name: "WBitcoin", image: btcImage },
-  { symbol: "USD", name: "USD", image: usdImage }
+  { symbol: "WBTC", name: "Wrapped Bitcoin", image: btcImage },
+  { symbol: "USD", name: "Dolar Americano", image: usdImage }
 ]
 
 export const TOKEN_ADDRESSES = {

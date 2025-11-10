@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowDownLeft, Send, Repeat, ArrowUpRight, LoaderCircle, Info, Loader2 } from "lucide-react";
+import { ArrowDownLeft, Send, Repeat, ArrowUpRight, LoaderCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { memo, useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -14,8 +14,6 @@ import Vault from "@/abi/Vault.json";
 import { getPublicClient } from "@/lib/utils";
 import { TOKEN_ADDRESSES } from "@/lib/utils";
 import {usePrivy} from '@privy-io/react-auth';
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 const quickActions = [
   {
@@ -67,8 +65,6 @@ const DashboardPage = memo(function DashboardPage() {
     WBTC: { wallet: "0", deposited: "0" },
   });
   const [loading, setLoading] = useState(true);
-  const [isMinting, setIsMinting] = useState(false);
-  const [mintStatus, setMintStatus] = useState<string>("");
 
   const fetchBalances = useCallback(async () => {
       if (!ready || !user) {
@@ -200,83 +196,24 @@ const DashboardPage = memo(function DashboardPage() {
     }
   }, [searchParams, router, fetchBalances]);
 
+  // Escutar evento de mint completado do header
+  useEffect(() => {
+    const handleMintCompleted = () => {
+      console.log('🔄 Mint completado, atualizando saldos...');
+      fetchBalances();
+    };
+
+    window.addEventListener('mintCompleted', handleMintCompleted);
+    return () => {
+      window.removeEventListener('mintCompleted', handleMintCompleted);
+    };
+  }, [fetchBalances]);
+
   const formatBalance = (balance: string) => {
     const num = parseFloat(balance);
     if (num === 0) return "0";
     if (num < 0.000001) return "< 0.000001";
     return num.toFixed(6);
-  };
-
-  const handleRequestTestUSD = async () => {
-    if (!user || !ready) return;
-
-    const smartWallet = user?.linkedAccounts?.find(
-      (acc) => acc.type === 'smart_wallet'
-    );
-
-    if (!smartWallet?.address) {
-      toast.error("Carteira não encontrada");
-      return;
-    }
-
-    setIsMinting(true);
-    setMintStatus("Enviando transação...");
-
-    try {
-      const mintResponse = await fetch('/api/mint-usd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userAddress: smartWallet.address }),
-      });
-
-      const mintResult = await mintResponse.json();
-
-      if (mintResult.success && mintResult.transactionHash) {
-        setMintStatus("Aguardando confirmação da transação...");
-        
-        // Aguardar a confirmação da transação na blockchain
-        const publicClient = getPublicClient();
-        
-        try {
-          await publicClient.waitForTransactionReceipt({
-            hash: mintResult.transactionHash as `0x${string}`,
-            timeout: 60000, // 60 segundos de timeout
-          });
-
-          setMintStatus("Transação confirmada! Atualizando saldos...");
-          toast.success("USD de teste solicitado com sucesso!");
-          
-          // Aguardar um pouco para garantir que a blockchain atualizou
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Atualizar os saldos após a confirmação
-          await fetchBalances();
-        } catch (waitError) {
-          console.error('Erro ao aguardar confirmação:', waitError);
-          // Mesmo se houver erro ao aguardar, tentar atualizar os saldos
-          setMintStatus("Verificando saldos...");
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          await fetchBalances();
-          toast.success("Transação enviada! Verificando saldos...");
-        }
-      } else if (mintResult.success) {
-        // Se não há transactionHash mas foi bem-sucedido, aguardar e atualizar
-        setMintStatus("Processando...");
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        await fetchBalances();
-        toast.success("USD de teste solicitado com sucesso!");
-      } else {
-        toast.error(mintResult.error || "Erro ao solicitar USD de teste");
-      }
-    } catch (error) {
-      console.error('Erro ao solicitar USD de teste:', error);
-      toast.error("Erro ao solicitar USD de teste");
-    } finally {
-      setIsMinting(false);
-      setMintStatus("");
-    }
   };
 
   return (
@@ -405,42 +342,10 @@ const DashboardPage = memo(function DashboardPage() {
                 </span>
               </div>
 
-              {/* Botão para solicitar USD de teste */}
-              <div className="pt-4 border-t border-gray-200">
-                <Button
-                  onClick={handleRequestTestUSD}
-                  disabled={isMinting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isMinting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      Processando...
-                    </>
-                  ) : (
-                    "Solicitar USD de teste"
-                  )}
-                </Button>
-              </div>
             </div>
           )}
         </Card>
       </div>
-
-      {/* Popup de loading durante o mint */}
-      {isMinting && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md bg-white border border-gray-200 shadow-lg p-6">
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              <p className="text-lg font-medium text-gray-800">Solicitando USD de teste...</p>
-              <p className="text-sm text-gray-600 text-center">
-                {mintStatus || "Estamos processando sua solicitação. Isso pode levar alguns segundos."}
-              </p>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   );
 });
