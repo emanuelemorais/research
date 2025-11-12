@@ -136,12 +136,7 @@ export default function InstructionsPage() {
           <CardContent className="space-y-6">
             {/* Platform 2 Steps */}
             <div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-gray-700">
-                  <strong>Nota:</strong> Repare que a sua carteira já terá tokens USD
-                  previamente para realizar a interação.
-                </p>
-              </div>
+              
               <ol className="space-y-3 list-decimal list-inside">
                 <li className="text-gray-700 flex items-start gap-2">
                   <span className="font-medium">1. Solicitar tokens USD de teste - Irá aparecer um popup na tela para solicitar os tokens assim que você entrar na plataforma que irá mintar para a carteira logada 1000 USD tokens.</span>
@@ -274,12 +269,7 @@ export default function InstructionsPage() {
                 <ArrowRight className="w-4 h-4 text-green-600" />
                 Passos a serem cumpridos ao interagir com a plataforma:
               </h3>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-gray-700">
-                  <strong>Nota:</strong> Repare que a sua carteira já terá tokens USD
-                  previamente para realizar a interação.
-                </p>
-              </div>
+             
               <ol className="space-y-3 list-decimal list-inside">
               <li className="text-gray-700 flex items-start gap-2">
                   <span className="font-medium">1. Solicitar tokens USD de teste - Irá aparecer um popup na tela para solicitar os tokens assim que você entrar na plataforma que irá mintar para a carteira logada 1000 USD tokens.</span>
