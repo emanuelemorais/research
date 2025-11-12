@@ -122,7 +122,7 @@ export function TransferCard() {
           <div className="flex justify-between">
             <Label>Quantidade</Label>
             <span className="text-sm text-muted-foreground">
-              Saldo:  {depositBalance ? Number(formatUnits(depositBalance as bigint, getTokenDecimals(selectedToken))).toFixed(6) : "0.0000"} {selectedToken}
+              Saldo:  {depositBalance ?selectedToken === "USD" ? Number(formatUnits(depositBalance as bigint, getTokenDecimals(selectedToken))).toFixed(2) : Number(formatUnits(depositBalance as bigint, getTokenDecimals(selectedToken))).toFixed(8) : "0.000000"} {selectedToken}
             </span>
           </div>
           <div className="relative">

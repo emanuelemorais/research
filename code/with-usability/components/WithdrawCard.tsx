@@ -31,6 +31,10 @@ export function WithdrawCard() {
 
   const wallet = user?.linkedAccounts?.find((account) => account.type === 'smart_wallet')?.address as `0x${string}` | undefined;
 
+  const getTokenDecimals = (token: keyof typeof TOKEN_ADDRESSES): number => {
+    return token === "WBTC" ? 8 : token === "USD" ? 2 : 4;
+  };
+
   const saveButtonClick = async (buttonId: number) => {
     if (!sessionId) return;
     try {
@@ -127,7 +131,7 @@ export function WithdrawCard() {
         open={openWithdrawConfirmationDialog}
         onClose={() => setOpenWithdrawConfirmationDialog(false)}
         token={selectedToken}
-        totalDeposited={balance.toFixed(4)}
+        totalDeposited={balance.toFixed(getTokenDecimals(selectedToken))}
         withdrawAmount={amount}
         onConfirm={handleWithdraw}
       />
@@ -163,7 +167,7 @@ export function WithdrawCard() {
             <div className="flex justify-between">
               <Label>Quantidade</Label>
               <span className="text-sm text-muted-foreground">
-                Disponível: {balance.toFixed(4)} {selectedToken}
+                Disponível: {balance.toFixed(getTokenDecimals(selectedToken))} {selectedToken}
               </span>
             </div>
             <div className="relative">
@@ -178,7 +182,7 @@ export function WithdrawCard() {
                 variant="ghost"
                 size="sm"
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-700 hover:bg-blue-50 cursor-pointer"
-                onClick={() => setAmount(balance.toFixed(4))}
+                onClick={() => setAmount(balance.toFixed(getTokenDecimals(selectedToken)))}
               >
                 MAX
               </Button>

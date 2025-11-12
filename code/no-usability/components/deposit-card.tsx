@@ -162,7 +162,7 @@ export function DepositCard() {
           <div className="flex justify-between">
             <Label>Quantidade</Label>
             <span className="text-sm text-muted-foreground">
-              Saldo na carteira: {balanceData?.formatted ? Number(balanceData?.formatted).toFixed(4) : "0.0000"} {selectedToken}
+              Saldo na carteira: {balanceData?.formatted ?selectedToken === "USD" ? Number(balanceData?.formatted).toFixed(2) : Number(balanceData?.formatted).toFixed(8) : "0.000000"} {selectedToken}
             </span>
           </div>
           <div className="relative">

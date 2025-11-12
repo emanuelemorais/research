@@ -34,6 +34,9 @@ export function TransferCard() {
 
   const wallet = user?.linkedAccounts?.find((account) => account.type === 'smart_wallet')?.address as `0x${string}` | undefined;
 
+  const getTokenDecimals = (token: keyof typeof TOKEN_ADDRESSES): number => {
+    return token === "WBTC" ? 8 : token === "USD" ? 2 : 4;
+  };
 
   if (!wallet) {
     return <div>Carregando smart account…</div>;
@@ -169,7 +172,7 @@ export function TransferCard() {
   // Validação de saldo insuficiente
   useEffect(() => {
     if (amount && Number.parseFloat(amount) > balance) {
-      toast.error(`Saldo insuficiente. Você possui ${balance.toFixed(4)} ${selectedToken} disponível.`);
+      toast.error(`Saldo insuficiente. Você possui ${balance.toFixed(getTokenDecimals(selectedToken))} ${selectedToken} disponível.`);
     }
   }, [amount, balance, selectedToken])
 
@@ -229,7 +232,7 @@ export function TransferCard() {
         <div className="space-y-2 mb-8">
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">
-              Saldo disponível: {balance.toFixed(4)} {selectedToken}
+              Saldo disponível: {balance.toFixed(getTokenDecimals(selectedToken))} {selectedToken}
             </span>
           </div>
           <div className="relative">
@@ -246,7 +249,7 @@ export function TransferCard() {
               variant="ghost"
               size="sm"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-700 hover:bg-blue-50"
-              onClick={() => setAmount(balance.toFixed(4))}
+              onClick={() => setAmount(balance.toFixed(getTokenDecimals(selectedToken)))}
             >
               MAX
             </Button>

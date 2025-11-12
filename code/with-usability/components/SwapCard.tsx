@@ -36,6 +36,10 @@ export function SwapCard() {
 
   const wallet = user?.linkedAccounts?.find((account) => account.type === 'smart_wallet')?.address as `0x${string}` | undefined;
   
+  const getTokenDecimals = (token: keyof typeof TOKEN_ADDRESSES): number => {
+    return token === "WBTC" ? 8 : token === "USD" ? 2 : 4;
+  };
+
   const saveButtonClick = async (buttonId: number) => {
     if (!sessionId) return;
     try {
@@ -91,7 +95,7 @@ export function SwapCard() {
   // Validação de saldo insuficiente
   useEffect(() => {
     if (fromAmount && Number(fromAmount) > fromBalance) {
-      toast.error(`Saldo insuficiente. Você possui ${fromBalance.toFixed(4)} ${fromToken} depositado.`);
+      toast.error(`Saldo insuficiente. Você possui ${fromBalance.toFixed(getTokenDecimals(fromToken))} ${fromToken} depositado.`);
     }
   }, [fromAmount, fromBalance, fromToken])
 
@@ -121,7 +125,8 @@ export function SwapCard() {
   // Validação de liquidez
   useEffect(() => {
     if (exchangeRate !== null && liquidity !== null && exchangeRate > liquidity) {
-      toast.error(`Liquidez insuficiente. Disponível: ${liquidity.toFixed(6)} ${toToken}, necessário: ${exchangeRate.toFixed(6)} ${toToken}`);
+      const decimals = getTokenDecimals(toToken);
+      toast.error(`Liquidez insuficiente. Disponível: ${liquidity.toFixed(decimals)} ${toToken}, necessário: ${exchangeRate.toFixed(decimals)} ${toToken}`);
     }
   }, [exchangeRate, liquidity, toToken])
 
@@ -230,7 +235,7 @@ export function SwapCard() {
                 />
               </div>
               <div className="flex items-center text-sm text-muted-foreground">
-                <span>Saldo depositado: {fromBalance.toFixed(4)} {fromToken}</span>
+                <span>Saldo depositado: {fromBalance.toFixed(getTokenDecimals(fromToken))} {fromToken}</span>
               </div>
             </Card>
           </div>
@@ -278,7 +283,7 @@ export function SwapCard() {
                 />
               </div>
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>Liquidez: {liquidity !== null ? liquidity.toString() : "0.0000"}</span>
+                <span>Liquidez: {liquidity !== null ? liquidity.toFixed(getTokenDecimals(toToken)) : (0).toFixed(getTokenDecimals(toToken))}</span>
                 {exchangeRate !== null && liquidity !== null && exchangeRate > liquidity && (
                   <span className="text-red-600 font-medium">Liquidez insuficiente</span>
                 )}

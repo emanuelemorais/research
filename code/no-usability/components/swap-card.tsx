@@ -142,7 +142,7 @@ export function SwapCard() {
             </div>
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>{fromToken}</span>
-              <span>Saldo: {userBalance ? Number(userBalance as bigint / BigInt(10 ** getTokenDecimals(fromToken))).toFixed(4) : "0.0000"}</span>
+              <span>Saldo: {userBalance ?fromToken === "USD" ? Number(userBalance as bigint / BigInt(10 ** getTokenDecimals(fromToken))).toFixed(2) : Number(userBalance as bigint / BigInt(10 ** getTokenDecimals(fromToken))).toFixed(8) : "0.000000"}</span>
             </div>
           </Card>
         </div>
@@ -176,7 +176,7 @@ export function SwapCard() {
             </div>
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>{toToken}</span>
-              <span>Liquidez: {poolLiquidity ? Number(poolLiquidity as bigint / BigInt(10 ** getTokenDecimals(toToken))).toFixed(4) : "0.0000"}</span>
+              <span>Liquidez: {poolLiquidity ?toAmount === "USD" ? Number(poolLiquidity as bigint / BigInt(10 ** getTokenDecimals(toToken))).toFixed(2) : Number(poolLiquidity as bigint / BigInt(10 ** getTokenDecimals(toToken))).toFixed(8) : "0.0000"}</span>
             </div>
           </Card>
         </div>
@@ -187,19 +187,19 @@ export function SwapCard() {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Taxa de câmbio</span>
             <span className="font-medium">
-              1 {fromToken} ≈ {exchangeAmount ? (Number(formatUnits(exchangeAmount as bigint, getTokenDecimals(toToken))) / Number.parseFloat(fromAmount)).toFixed(4) : "Calculando..."} {exchangeAmount ? toToken : ""}
+              1 {fromToken} ≈ {exchangeAmount ? (Number(formatUnits(exchangeAmount as bigint, getTokenDecimals(toToken))) / Number.parseFloat(fromAmount)).toFixed(8) : "Calculando..."} {exchangeAmount ? toToken : ""}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Seu saldo</span>
             <span className="font-medium">
-              {userBalance ? Number(userBalance as bigint / BigInt(10 ** getTokenDecimals(fromToken))).toFixed(4) : "0.0000"} {fromToken}
+              {userBalance ?fromAmount === "USD" ? Number(userBalance as bigint / BigInt(10 ** getTokenDecimals(fromToken))).toFixed(2) : Number(userBalance as bigint / BigInt(10 ** getTokenDecimals(fromToken))).toFixed(8) : "0.000000"} {fromToken}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Liquidez disponível</span>
             <span className="font-medium">
-              {poolLiquidity ? Number(poolLiquidity as bigint / BigInt(10 ** getTokenDecimals(toToken))).toFixed(4) : "0.0000"} {toToken}
+              {poolLiquidity ? Number(poolLiquidity as bigint / BigInt(10 ** getTokenDecimals(toToken))).toFixed(6) : "0.0000"} {toToken}
             </span>
           </div>
         </div>

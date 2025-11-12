@@ -123,28 +123,28 @@ export default function ResultPage() {
     const stepsFixed: Step[] = [
       {
         id: 1,
-        route: process.env.NEXT_PUBLIC_NO_USABILITY_LINK as string,
-        platformId: 1,
-        type: 'platform',
-      },
-      {
-        id: 2,
-        route: '/nasa-tlx',
-        platformId: 1,
-        type: 'form',
-      },
-      {
-        id: 3,
         route: process.env.NEXT_PUBLIC_WITH_USABILITY_LINK as string,
         platformId: 2,
         type: 'platform',
       },
       {
-        id: 4,
+        id: 2,
         route: '/nasa-tlx',
         platformId: 2,
         type: 'form',
       },
+      {
+        id: 3,
+        route: process.env.NEXT_PUBLIC_NO_USABILITY_LINK as string,
+        platformId: 1,
+        type: 'platform',
+      },
+      {
+        id: 4,
+        route: '/nasa-tlx',
+        platformId: 1,
+        type: 'form',
+      }
     ];
 
     setSteps(stepsFixed);

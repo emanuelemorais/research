@@ -209,11 +209,12 @@ const DashboardPage = memo(function DashboardPage() {
     };
   }, [fetchBalances]);
 
-  const formatBalance = (balance: string) => {
+  const formatBalance = (balance: string, decimals: number = 6) => {
     const num = parseFloat(balance);
     if (num === 0) return "0";
-    if (num < 0.000001) return "< 0.000001";
-    return num.toFixed(6);
+    const threshold = Math.pow(10, -decimals);
+    if (num < threshold) return `< ${threshold}`;
+    return num.toFixed(decimals);
   };
 
   return (
@@ -279,7 +280,7 @@ const DashboardPage = memo(function DashboardPage() {
                   USD
                 </span>
                 <span className="font-semibold text-gray-900">
-                  {formatBalance(balances.USD.deposited)} USD
+                  {formatBalance(balances.USD.deposited, 2)} USD
                 </span>
               </div>
 
@@ -290,7 +291,7 @@ const DashboardPage = memo(function DashboardPage() {
                   WBTC
                 </span>
                 <span className="font-semibold text-gray-900">
-                  {formatBalance(balances.WBTC.deposited)} WBTC
+                  {formatBalance(balances.WBTC.deposited, 8)} WBTC
                 </span>
               </div>
             </div>
@@ -327,7 +328,7 @@ const DashboardPage = memo(function DashboardPage() {
                   USD
                 </span>
                 <span className="font-semibold text-gray-900">
-                  {formatBalance(balances.USD.wallet)} USD
+                  {formatBalance(balances.USD.wallet, 2)} USD
                 </span>
               </div>
 
@@ -338,7 +339,7 @@ const DashboardPage = memo(function DashboardPage() {
                   WBTC
                 </span>
                 <span className="font-semibold text-gray-900">
-                  {formatBalance(balances.WBTC.wallet)} WBTC
+                  {formatBalance(balances.WBTC.wallet, 8)} WBTC
                 </span>
               </div>
 

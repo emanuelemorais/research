@@ -123,12 +123,79 @@ export default function InstructionsPage() {
           </CardContent>
         </Card>
 
+        
+
+        {/* Platform 2 Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-purple-600" />
+              Plataforma 1
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Platform 2 Steps */}
+            <div>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-700">
+                  <strong>Nota:</strong> Repare que a sua carteira já terá tokens USD
+                  previamente para realizar a interação.
+                </p>
+              </div>
+              <ol className="space-y-3 list-decimal list-inside">
+                <li className="text-gray-700 flex items-start gap-2">
+                  <span className="font-medium">1. Solicitar tokens USD de teste - Irá aparecer um popup na tela para solicitar os tokens assim que você entrar na plataforma que irá mintar para a carteira logada 1000 USD tokens.</span>
+                </li>
+                <li className="text-gray-700 flex items-start gap-2">
+                  <span className="font-medium">2. Realizar um depósito - Deposite os tokens USD recebidos na plataforma.</span>
+                </li>
+                <li className="text-gray-700 flex items-start gap-2">
+                  <span className="font-medium">3. Fazer uma troca de tokens de USD para WBTC - Troque 500 tokens USD para WBTC.</span>
+                </li>
+                <li className="text-gray-700 flex items-start gap-2">
+                  <span className="font-medium">
+                    4. Transferir tokens para outra carteira - Envie 200 tokens USD para email de destino. → Enviar para{' '}
+                    <button
+                      onClick={handleCopyEmail}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded text-blue-700 font-mono text-sm transition-colors cursor-pointer"
+                      title="Clique para copiar"
+                    >
+                      {emailAddress}
+                      {emailCopied ? (
+                        <Check className="w-3 h-3 text-green-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </button>
+                  </span>
+                </li>
+                <li className="text-gray-700 flex items-start gap-2">
+                  <span className="font-medium">5. Retirar tokens da plataforma - Retire restantes os tokens USD da plataforma.</span>
+                </li>
+                <li className="text-gray-700 flex items-start gap-2">
+                  <span className="font-medium">6. Fazer logout da plataforma.</span>
+                </li>
+              </ol>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <p className="text-yellow-900 text-sm">
+                  <strong>Importante!</strong> Ao fazer logout não será mais possível entrar na
+                  plataforma, então só saia em caso de finalização ou desistência.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Platform 1 Section */}
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center gap-2">
               <Wallet className="w-5 h-5 text-green-600" />
-              Plataforma 1
+              Plataforma 2
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -215,17 +282,17 @@ export default function InstructionsPage() {
               </div>
               <ol className="space-y-3 list-decimal list-inside">
               <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">1. Solicitar tokens USD de teste</span>
+                  <span className="font-medium">1. Solicitar tokens USD de teste - Irá aparecer um popup na tela para solicitar os tokens assim que você entrar na plataforma que irá mintar para a carteira logada 1000 USD tokens.</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">2. Realizar um depósito</span>
+                  <span className="font-medium">2. Realizar um depósito - Deposite os tokens USD recebidos na plataforma.</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">3. Fazer um swap de USD para WBTC</span>
+                  <span className="font-medium">3. Fazer uma troca de tokens de USD para WBTC - Troque 500 tokens USD para WBTC.</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
                   <span className="font-medium">
-                    4. Transferir tokens para outra carteira → Enviar para{' '}
+                    4. Transferir tokens para outra carteira - Envie 200 tokens USD para a carteira de destino. → Enviar para{' '}
                     <button
                       onClick={handleCopyAddress}
                       className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded text-blue-700 font-mono text-sm transition-colors cursor-pointer"
@@ -241,76 +308,10 @@ export default function InstructionsPage() {
                   </span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">5. Retirar tokens da plataforma</span>
+                  <span className="font-medium">5. Retirar tokens da plataforma - Retire os tokens USD da plataforma.</span>
                 </li>
                 <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">6. Fazer logout</span>
-                </li>
-              </ol>
-            </div>
-
-            {/* Warning */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                <p className="text-yellow-900 text-sm">
-                  <strong>Importante!</strong> Ao fazer logout não será mais possível entrar na
-                  plataforma, então só saia em caso de finalização ou desistência.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Platform 2 Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-purple-600" />
-              Plataforma 2
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Platform 2 Steps */}
-            <div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-gray-700">
-                  <strong>Nota:</strong> Repare que a sua carteira já terá tokens USD
-                  previamente para realizar a interação.
-                </p>
-              </div>
-              <ol className="space-y-3 list-decimal list-inside">
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">1. Solicitar tokens USD de teste</span>
-                </li>
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">2. Realizar um depósito</span>
-                </li>
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">3. Fazer um swap de USD para WBTC</span>
-                </li>
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">
-                    4. Transferir tokens para outra carteira → envie para{' '}
-                    <button
-                      onClick={handleCopyEmail}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded text-blue-700 font-mono text-sm transition-colors cursor-pointer"
-                      title="Clique para copiar"
-                    >
-                      {emailAddress}
-                      {emailCopied ? (
-                        <Check className="w-3 h-3 text-green-600" />
-                      ) : (
-                        <Copy className="w-3 h-3" />
-                      )}
-                    </button>
-                  </span>
-                </li>
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">5. Retirar tokens da plataforma</span>
-                </li>
-                <li className="text-gray-700 flex items-start gap-2">
-                  <span className="font-medium">6. Fazer logout</span>
+                  <span className="font-medium">6. Fazer logout da plataforma.</span>
                 </li>
               </ol>
             </div>
