@@ -292,8 +292,8 @@ export default function ResultPage() {
               const completed = isStepCompleted(step.id);
               const label =
                 step.type === 'platform'
-                  ? `Plataforma ${step.platformId}`
-                  : `Formulário ${step.platformId}`;
+                  ? `Plataforma ${step.platformId == 1 ? "2" : "1"}`
+                  : `Formulário ${step.platformId == 1 ? "2" : "1"}`;
 
               return (
                 <div key={step.id} className="flex flex-col items-center gap-2">
