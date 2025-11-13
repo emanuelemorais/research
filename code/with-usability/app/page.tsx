@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState(Array(6).fill(''));
   const [codeSent, setCodeSent] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { sendCode, loginWithCode } = useLoginWithEmail();
   const { signupWithPasskey } = useSignupWithPasskey();
   const { loading, initOAuth } = useLoginWithOAuth();
@@ -59,6 +60,7 @@ export default function LoginPage() {
       if (!ready || !authenticated || !user || hasCreatedWallet) return;
 
       try {
+        setIsRedirecting(true);
         setHasCreatedWallet(true);
 
         const hasEmbeddedWallet = user.linkedAccounts.some(
@@ -129,7 +131,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 relative">
+      {isRedirecting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-4 shadow-xl">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+            <p className="text-lg font-medium text-gray-800">Redirecionando...</p>
+            <p className="text-sm text-gray-500">Aguarde enquanto preparamos sua conta</p>
+          </div>
+        </div>
+      )}
       <Card className="w-full max-w-md bg-white border border-gray-200 shadow-lg">
         <CardHeader className="text-center">
           <div className="mb-6">
