@@ -25,6 +25,7 @@ export function TransferCard() {
   const [balance, setBalance] = useState<number>(0)
   const [showDialog, setShowDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [pendingUpdate, setPendingUpdate] = useState(false)
   const [recipientWallet, setRecipientWallet] = useState<`0x${string}` | null>(null)
   const [displayName, setDisplayName] = useState<string | null>(null)
 
@@ -37,6 +38,24 @@ export function TransferCard() {
   const getTokenDecimals = (token: keyof typeof TOKEN_ADDRESSES): number => {
     return token === "WBTC" ? 8 : token === "USD" ? 2 : 4;
   };
+
+  // Função para detectar se o Google Translate está ativo
+  const isGoogleTranslateActive = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    try {
+      const hasTranslateElements = 
+        document.querySelector('[class*="skiptranslate"]') !== null ||
+        document.querySelector('[id*="google_translate"]') !== null ||
+        document.body.getAttribute('data-google-translate') !== null ||
+        document.documentElement.classList.contains('translated-ltr') ||
+        document.documentElement.classList.contains('translated-rtl');
+      
+      return hasTranslateElements;
+    } catch (error) {
+      return false;
+    }
+  }
 
   if (!wallet) {
     return <div>Carregando smart account…</div>;
@@ -145,17 +164,38 @@ export function TransferCard() {
       // Salva a tarefa como concluída após sucesso
       await saveTaskCompleted(5); // Transfer taskId = 5
       
-      await fetchBalance();
-      
-      // Limpar o campo de valor após sucesso
-      setAmount("");
+      // Marcar que há atualização pendente
+      setPendingUpdate(true);
     } catch (error) {
       console.error("Erro ao transferir:", error);
       toast.error("Erro ao realizar transferência");
+      setPendingUpdate(false);
     } finally {
       setIsLoading(false);
     }
   }
+
+  // Atualizar estados após o diálogo fechar completamente
+  useEffect(() => {
+    if (!showDialog && pendingUpdate && wallet) {
+      const updateBalance = async () => {
+        const balance = await handleBalanceOnContract(wallet, TOKEN_ADDRESSES[selectedToken] as `0x${string}`);
+        if (balance !== undefined) {
+          setBalance(balance);
+        }
+        setAmount("");
+        setPendingUpdate(false);
+      };
+      
+      // Delay maior quando Google Translate está ativo para evitar conflitos de DOM
+      const delay = isGoogleTranslateActive() ? 500 : 200;
+      const timeoutId = setTimeout(() => {
+        updateBalance();
+      }, delay);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [showDialog, pendingUpdate, wallet, selectedToken])
 
   const fetchBalance = async () => {
     const balance = await handleBalanceOnContract(wallet, TOKEN_ADDRESSES[selectedToken] as `0x${string}`);

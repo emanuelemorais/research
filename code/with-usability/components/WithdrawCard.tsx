@@ -24,6 +24,7 @@ export function WithdrawCard() {
   const [amount, setAmount] = useState("")
   const [balance, setBalance] = useState<number>(0)
   const [openWithdrawConfirmationDialog, setOpenWithdrawConfirmationDialog] = useState(false)
+  const [pendingUpdate, setPendingUpdate] = useState(false)
   const { user, ready } = usePrivy();
   const { client } = useSmartWallets();
   const [loading, setLoading] = useState(false)
@@ -75,6 +76,24 @@ export function WithdrawCard() {
     }
   };
 
+  // Função para detectar se o Google Translate está ativo
+  const isGoogleTranslateActive = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    try {
+      const hasTranslateElements = 
+        document.querySelector('[class*="skiptranslate"]') !== null ||
+        document.querySelector('[id*="google_translate"]') !== null ||
+        document.body.getAttribute('data-google-translate') !== null ||
+        document.documentElement.classList.contains('translated-ltr') ||
+        document.documentElement.classList.contains('translated-rtl');
+      
+      return hasTranslateElements;
+    } catch (error) {
+      return false;
+    }
+  }
+
   const handleWithdraw = async () => {
     try{
   
@@ -105,20 +124,43 @@ export function WithdrawCard() {
         }
       );
   
-      await fetchBalance();
       toast.success("Saque realizado com sucesso!");
       
       // Salva a tarefa como concluída após sucesso
       await saveTaskCompleted(3); // Withdraw taskId = 3
       
-      setAmount("");
+      // Marcar que há atualização pendente
+      setPendingUpdate(true);
     } catch (error) {
       console.error("Erro ao realizar saque:", error);
       toast.error("Erro ao realizar saque");
+      setPendingUpdate(false);
     } finally {
       setLoading(false);
     }
   }
+
+  // Atualizar estados após o diálogo fechar completamente
+  useEffect(() => {
+    if (!openWithdrawConfirmationDialog && pendingUpdate && wallet) {
+      const updateBalance = async () => {
+        const balance = await handleBalanceOnContract(wallet, TOKEN_ADDRESSES[selectedToken] as `0x${string}`);
+        if (balance !== undefined) {
+          setBalance(balance);
+        }
+        setAmount("");
+        setPendingUpdate(false);
+      };
+      
+      // Delay maior quando Google Translate está ativo para evitar conflitos de DOM
+      const delay = isGoogleTranslateActive() ? 500 : 200;
+      const timeoutId = setTimeout(() => {
+        updateBalance();
+      }, delay);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [openWithdrawConfirmationDialog, pendingUpdate, wallet, selectedToken])
 
   useEffect(() => {
     if (!wallet) return;

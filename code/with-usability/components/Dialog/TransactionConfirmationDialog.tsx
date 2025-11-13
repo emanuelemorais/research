@@ -18,14 +18,20 @@ import { Loader2, CheckCircle2, ShieldCheck } from "lucide-react"
 const isGoogleTranslateActive = (): boolean => {
   if (typeof window === 'undefined') return false;
   
-  // Google Translate adiciona elementos com essas características
-  const hasTranslateElements = 
-    document.querySelector('[class*="skiptranslate"]') !== null ||
-    document.querySelector('[id*="google_translate"]') !== null ||
-    document.documentElement.lang !== document.documentElement.getAttribute('data-original-lang') ||
-    document.body.getAttribute('data-google-translate') !== null;
-  
-  return hasTranslateElements;
+  try {
+    // Google Translate adiciona elementos com essas características
+    const hasTranslateElements = 
+      document.querySelector('[class*="skiptranslate"]') !== null ||
+      document.querySelector('[id*="google_translate"]') !== null ||
+      document.body.getAttribute('data-google-translate') !== null ||
+      document.documentElement.classList.contains('translated-ltr') ||
+      document.documentElement.classList.contains('translated-rtl');
+    
+    return hasTranslateElements;
+  } catch (error) {
+    // Se houver erro ao verificar, assumir que não está ativo para evitar problemas
+    return false;
+  }
 }
 
 interface TransactionConfirmationDialogProps {
@@ -58,18 +64,33 @@ export function TransactionConfirmationDialog({
     setHasTranslate(isGoogleTranslateActive())
     
     // Observar mudanças no DOM que podem indicar ativação do translate
-    const observer = new MutationObserver(() => {
-      setHasTranslate(isGoogleTranslateActive())
-    })
-    
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'id', 'lang']
-    })
-    
-    return () => observer.disconnect()
+    try {
+      const observer = new MutationObserver(() => {
+        try {
+          setHasTranslate(isGoogleTranslateActive())
+        } catch (error) {
+          // Ignorar erros no observer para evitar loops
+        }
+      })
+      
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'id', 'lang']
+      })
+      
+      return () => {
+        try {
+          observer.disconnect()
+        } catch (error) {
+          // Ignorar erros ao desconectar
+        }
+      }
+    } catch (error) {
+      // Se houver erro ao criar observer, continuar sem ele
+      return () => {}
+    }
   }, [])
 
   const handleConfirm = async () => {

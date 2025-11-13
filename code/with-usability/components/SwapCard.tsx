@@ -29,6 +29,7 @@ export function SwapCard() {
   const [liquidity, setLiquidity] = useState<number | null>(null)
   const [openSwapConfirmationDialog, setOpenSwapConfirmationDialog] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [pendingUpdate, setPendingUpdate] = useState(false)
 
   const { user, ready } = usePrivy();
   const { client } = useSmartWallets();
@@ -39,6 +40,24 @@ export function SwapCard() {
   const getTokenDecimals = (token: keyof typeof TOKEN_ADDRESSES): number => {
     return token === "WBTC" ? 8 : token === "USD" ? 2 : 4;
   };
+
+  // Função para detectar se o Google Translate está ativo
+  const isGoogleTranslateActive = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    try {
+      const hasTranslateElements = 
+        document.querySelector('[class*="skiptranslate"]') !== null ||
+        document.querySelector('[id*="google_translate"]') !== null ||
+        document.body.getAttribute('data-google-translate') !== null ||
+        document.documentElement.classList.contains('translated-ltr') ||
+        document.documentElement.classList.contains('translated-rtl');
+      
+      return hasTranslateElements;
+    } catch (error) {
+      return false;
+    }
+  }
 
   const saveButtonClick = async (buttonId: number) => {
     if (!sessionId) return;
@@ -161,21 +180,44 @@ export function SwapCard() {
       }
     );
 
-    setFromAmount("");
-    setToAmount("");
-
-    await fetchBalance();
     toast.success("Troca realizada com sucesso!");
 
     await saveTaskCompleted(4);
+    
+    // Marcar que há atualização pendente
+    setPendingUpdate(true);
      
   } catch (error) {
     console.error("Erro ao realizar troca:", error);
     toast.error("Erro ao realizar troca");
+    setPendingUpdate(false);
   } finally {
     setLoading(false);
   }
   }
+
+  // Atualizar estados após o diálogo fechar completamente
+  useEffect(() => {
+    if (!openSwapConfirmationDialog && pendingUpdate && wallet) {
+      const updateBalance = async () => {
+        const balance = await handleBalanceOnContract(wallet, TOKEN_ADDRESSES[fromToken] as `0x${string}`);
+        if (balance !== undefined) {
+          setFromBalance(balance);
+        }
+        setFromAmount("");
+        setToAmount("");
+        setPendingUpdate(false);
+      };
+      
+      // Delay maior quando Google Translate está ativo para evitar conflitos de DOM
+      const delay = isGoogleTranslateActive() ? 500 : 200;
+      const timeoutId = setTimeout(() => {
+        updateBalance();
+      }, delay);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [openSwapConfirmationDialog, pendingUpdate, wallet, fromToken])
 
   return (
     <> 

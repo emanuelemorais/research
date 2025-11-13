@@ -178,12 +178,18 @@ export function DepositCard() {
   const isGoogleTranslateActive = (): boolean => {
     if (typeof window === 'undefined') return false;
     
-    const hasTranslateElements = 
-      document.querySelector('[class*="skiptranslate"]') !== null ||
-      document.querySelector('[id*="google_translate"]') !== null ||
-      document.body.getAttribute('data-google-translate') !== null;
-    
-    return hasTranslateElements;
+    try {
+      const hasTranslateElements = 
+        document.querySelector('[class*="skiptranslate"]') !== null ||
+        document.querySelector('[id*="google_translate"]') !== null ||
+        document.body.getAttribute('data-google-translate') !== null ||
+        document.documentElement.classList.contains('translated-ltr') ||
+        document.documentElement.classList.contains('translated-rtl');
+      
+      return hasTranslateElements;
+    } catch (error) {
+      return false;
+    }
   }
 
   // Atualizar estados após o diálogo fechar completamente

@@ -25,6 +25,7 @@ export default function LoginPage() {
   const [code, setCode] = useState(Array(6).fill(''));
   const [codeSent, setCodeSent] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [hasTranslate, setHasTranslate] = useState(false);
   const { sendCode, loginWithCode } = useLoginWithEmail();
   const { signupWithPasskey } = useSignupWithPasskey();
   const { loading, initOAuth } = useLoginWithOAuth();
@@ -34,6 +35,43 @@ export default function LoginPage() {
   const { createWallet } = useCreateWallet();
   const [hasCreatedWallet, setHasCreatedWallet] = useState(false);
   const { sessionId, userId } = useAppContext();
+
+  // Função para detectar se o Google Translate está ativo
+  const isGoogleTranslateActive = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    try {
+      const hasTranslateElements = 
+        document.querySelector('[class*="skiptranslate"]') !== null ||
+        document.querySelector('[id*="google_translate"]') !== null ||
+        document.body.getAttribute('data-google-translate') !== null ||
+        document.documentElement.classList.contains('translated-ltr') ||
+        document.documentElement.classList.contains('translated-rtl');
+      
+      return hasTranslateElements;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  useEffect(() => {
+    // Verificar se Google Translate está ativo
+    setHasTranslate(isGoogleTranslateActive())
+    
+    // Observar mudanças no DOM que podem indicar ativação do translate
+    const observer = new MutationObserver(() => {
+      setHasTranslate(isGoogleTranslateActive())
+    })
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'id', 'lang']
+    })
+    
+    return () => observer.disconnect()
+  }, [])
 
   const urlUserId = params?.userId as string;
   const urlSessionId = params?.sessionId as string;
@@ -177,16 +215,10 @@ export default function LoginPage() {
               </Button>
             </div>
 
-            <AnimatePresence>
-              {codeSent && (
-                <motion.div
-                  key="code-inputs"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
-                  className="flex flex-col items-center mt-4 space-y-3"
-                >
+            {hasTranslate ? (
+              // Renderização simples sem animações quando Google Translate está ativo
+              codeSent && (
+                <div className="flex flex-col items-center mt-4 space-y-3">
                   <p className="text-sm text-gray-600">
                     Digite o código de 6 dígitos enviado para seu email:
                   </p>
@@ -210,9 +242,47 @@ export default function LoginPage() {
                     <LogIn className="w-4 h-4 mr-1" />
                     Login
                   </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              )
+            ) : (
+              // Renderização com animações quando Google Translate não está ativo
+              <AnimatePresence mode="wait">
+                {codeSent && (
+                  <motion.div
+                    key="code-inputs"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    className="flex flex-col items-center mt-4 space-y-3"
+                  >
+                    <p className="text-sm text-gray-600">
+                      Digite o código de 6 dígitos enviado para seu email:
+                    </p>
+                    <div className="flex justify-center space-x-2">
+                      {code.map((digit, i) => (
+                        <Input
+                          key={i}
+                          id={`code-${i}`}
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleCodeChange(i, e.target.value)}
+                          className="w-10 h-12 text-center text-lg bg-gray-50 border border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 rounded-md transition-all"
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      onClick={handleLogin}
+                      className="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white shadow-sm cursor-pointer"
+                      disabled={code.join('').length < 6}
+                    >
+                      <LogIn className="w-4 h-4 mr-1" />
+                      Login
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
           </div>
 
           <Separator className="bg-gray-200" />
