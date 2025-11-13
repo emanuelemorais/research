@@ -20,18 +20,44 @@ const isGoogleTranslateActive = (): boolean => {
   
   try {
     // Google Translate adiciona elementos com essas características
-    const hasTranslateElements = 
-      document.querySelector('[class*="skiptranslate"]') !== null ||
-      document.querySelector('[id*="google_translate"]') !== null ||
-      document.body.getAttribute('data-google-translate') !== null ||
-      document.documentElement.classList.contains('translated-ltr') ||
-      document.documentElement.classList.contains('translated-rtl');
+    // Verificar múltiplos indicadores para maior confiabilidade
+    const checks = [
+      document.querySelector('[class*="skiptranslate"]') !== null,
+      document.querySelector('[id*="google_translate"]') !== null,
+      document.querySelector('[id*="gtx-trans"]') !== null,
+      document.body?.getAttribute('data-google-translate') !== null,
+      document.documentElement.classList.contains('translated-ltr'),
+      document.documentElement.classList.contains('translated-rtl'),
+      // Verificar se o lang mudou (indicador comum do Translate)
+      (() => {
+        const originalLang = document.documentElement.getAttribute('data-original-lang');
+        const currentLang = document.documentElement.getAttribute('lang');
+        return originalLang !== null && currentLang !== originalLang;
+      })()
+    ];
     
-    return hasTranslateElements;
+    return checks.some(check => check === true);
   } catch (error) {
-    // Se houver erro ao verificar, assumir que não está ativo para evitar problemas
-    return false;
+    // Se houver erro ao verificar, assumir que está ativo para segurança
+    // É melhor desabilitar animações do que ter erros
+    return true;
   }
+}
+
+// Listener global para capturar erros de DOM que podem indicar Google Translate
+let domErrorDetected = false;
+if (typeof window !== 'undefined') {
+  const originalErrorHandler = window.onerror;
+  window.addEventListener('error', (event) => {
+    if (event.message && (
+      event.message.includes('insertBefore') ||
+      event.message.includes('removeChild') ||
+      event.message.includes('appendChild') ||
+      event.message.includes('NotFoundError')
+    )) {
+      domErrorDetected = true;
+    }
+  }, true);
 }
 
 interface TransactionConfirmationDialogProps {
@@ -61,26 +87,47 @@ export function TransactionConfirmationDialog({
 
   useEffect(() => {
     // Verificar se Google Translate está ativo
-    setHasTranslate(isGoogleTranslateActive())
+    const checkTranslate = () => {
+      try {
+        const isActive = isGoogleTranslateActive() || domErrorDetected
+        setHasTranslate(isActive)
+        return isActive
+      } catch (error) {
+        // Em caso de erro, assumir que está ativo para segurança
+        setHasTranslate(true)
+        return true
+      }
+    }
+    
+    checkTranslate()
+    
+    // Verificar periodicamente também (não apenas com observer)
+    const intervalId = setInterval(() => {
+      checkTranslate()
+    }, 500)
     
     // Observar mudanças no DOM que podem indicar ativação do translate
     try {
       const observer = new MutationObserver(() => {
         try {
-          setHasTranslate(isGoogleTranslateActive())
+          checkTranslate()
         } catch (error) {
-          // Ignorar erros no observer para evitar loops
+          // Se houver erro, assumir que está ativo
+          setHasTranslate(true)
         }
       })
       
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'id', 'lang']
-      })
+      if (document.body) {
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class', 'id', 'lang']
+        })
+      }
       
       return () => {
+        clearInterval(intervalId)
         try {
           observer.disconnect()
         } catch (error) {
@@ -88,8 +135,11 @@ export function TransactionConfirmationDialog({
         }
       }
     } catch (error) {
-      // Se houver erro ao criar observer, continuar sem ele
-      return () => {}
+      // Se houver erro ao criar observer, assumir que está ativo para segurança
+      setHasTranslate(true)
+      return () => {
+        clearInterval(intervalId)
+      }
     }
   }, [])
 
@@ -98,14 +148,28 @@ export function TransactionConfirmationDialog({
     try {
       await onConfirm()
       setIsSuccess(true)
+      // Delay maior quando Google Translate está ativo para garantir que o DOM está estável
+      const delay = hasTranslate ? 2000 : 1600
       setTimeout(() => {
-        onClose()
-        setIsSuccess(false)
-      }, 1600)
+        // Verificar novamente antes de fechar para evitar erros
+        if (!isGoogleTranslateActive() || hasTranslate) {
+          onClose()
+          setIsSuccess(false)
+        } else {
+          // Se o translate foi ativado durante a transação, aguardar mais
+          setTimeout(() => {
+            onClose()
+            setIsSuccess(false)
+          }, 500)
+        }
+      }, delay)
     } catch (error) {
       console.error("Erro ao confirmar transação:", error)
-    } finally {
       setIsLoading(false)
+    } finally {
+      if (!isSuccess) {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -126,12 +190,13 @@ export function TransactionConfirmationDialog({
           )}
         </AlertDialogHeader>
 
+        {/* Sempre usar renderização simples quando Google Translate está ativo para evitar conflitos de DOM */}
         {hasTranslate ? (
           // Renderização simples sem animações quando Google Translate está ativo
-          <>
-            {!isLoading && !isSuccess && <div>{summary}</div>}
+          <div>
+            {!isLoading && !isSuccess && <div key="summary">{summary}</div>}
             {isLoading && !isSuccess && (
-              <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <div key="loading" className="flex flex-col items-center justify-center py-8 gap-3">
                 <Loader2 className="w-6 h-6 animate-spin text-blue-700" />
                 <p className="text-sm text-gray-600">
                   Transação sendo processada... aguarde confirmação.
@@ -139,14 +204,14 @@ export function TransactionConfirmationDialog({
               </div>
             )}
             {isSuccess && (
-              <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <div key="success" className="flex flex-col items-center justify-center py-8 gap-3">
                 <CheckCircle2 className="w-7 h-7 text-green-600" />
                 <p className="text-sm font-medium text-green-700">
                   {successMessage}
                 </p>
               </div>
             )}
-          </>
+          </div>
         ) : (
           // Renderização com animações quando Google Translate não está ativo
           <AnimatePresence mode="wait" initial={false}>
