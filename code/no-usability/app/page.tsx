@@ -6,17 +6,19 @@ import { ConnectButtonCustom } from "@/components/connect-button"
 import { Card } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { useAppContext } from "@/contexts/AppContext"
 
 export default function HomePage() {
   const router = useRouter()
 
   const { isConnected } = useAccount()
+  const { sessionId, userId } = useAppContext();
 
   useEffect(() => {
-    if (isConnected) {
-      router.push("/dashboard")
+    if (isConnected && sessionId && userId) {
+      router.push(`/${userId}/${sessionId}/dashboard`)
     }
-  }, [isConnected])
+  }, [isConnected, sessionId, userId])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">

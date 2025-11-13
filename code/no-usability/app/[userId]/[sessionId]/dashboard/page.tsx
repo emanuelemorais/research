@@ -1,7 +1,7 @@
 "use client"
 import { Card } from "@/components/ui/card"
 import { useAccount, useReadContract } from 'wagmi';
-import Vault from "../../abi/Vault.json"
+import Vault from "../../../../abi/Vault.json"
 import { formatEther, formatUnits } from "viem";
 import { memo } from "react";
 
@@ -62,3 +62,4 @@ const DashboardPage = memo(function DashboardPage() {
 });
 
 export default DashboardPage;
+

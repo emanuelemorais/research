@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { ArrowDownLeft, Send, Repeat, ArrowUpRight, LoaderCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { memo, useEffect, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, useParams } from "next/navigation";
 import btcImage from "@/images/bitcoin-btc-logo.svg";
 import usdImage from "@/images/dolar-usd-logo.svg";
 import { formatUnits } from "viem";
@@ -14,37 +14,6 @@ import Vault from "@/abi/Vault.json";
 import { getPublicClient } from "@/lib/utils";
 import { TOKEN_ADDRESSES } from "@/lib/utils";
 import {usePrivy} from '@privy-io/react-auth';
-
-const quickActions = [
-  {
-    label: "Depositar",
-    href: "/dashboard/deposit",
-    icon: ArrowDownLeft,
-    description: "Adicione fundos à sua conta DeFi.",
-    color: "bg-green-100 text-green-700 hover:bg-green-200",
-  },
-  {
-    label: "Transferir",
-    href: "/dashboard/transfer",
-    icon: Send,
-    description: "Envie tokens para outro usuário.",
-    color: "bg-blue-100 text-blue-700 hover:bg-blue-200",
-  },
-  {
-    label: "Trocar",
-    href: "/dashboard/swap",
-    icon: Repeat,
-    description: "Troque seus ativos de forma instantânea.",
-    color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200",
-  },
-  {
-    label: "Sacar",
-    href: "/dashboard/withdraw",
-    icon: ArrowUpRight,
-    description: "Retire seus fundos para a carteira.",
-    color: "bg-red-100 text-red-700 hover:bg-red-200",
-  },
-];
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}` | undefined;
 
@@ -57,6 +26,42 @@ const DashboardPage = memo(function DashboardPage() {
   const { user, ready } = usePrivy();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const params = useParams();
+  const userId = params?.userId as string;
+  const sessionId = params?.sessionId as string;
+
+  const basePath = userId && sessionId ? `/${userId}/${sessionId}/dashboard` : "/dashboard";
+
+  const quickActions = [
+    {
+      label: "Depositar",
+      href: `${basePath}/deposit`,
+      icon: ArrowDownLeft,
+      description: "Adicione fundos à sua conta DeFi.",
+      color: "bg-green-100 text-green-700 hover:bg-green-200",
+    },
+    {
+      label: "Transferir",
+      href: `${basePath}/transfer`,
+      icon: Send,
+      description: "Envie tokens para outro usuário.",
+      color: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+    },
+    {
+      label: "Trocar",
+      href: `${basePath}/swap`,
+      icon: Repeat,
+      description: "Troque seus ativos de forma instantânea.",
+      color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200",
+    },
+    {
+      label: "Sacar",
+      href: `${basePath}/withdraw`,
+      icon: ArrowUpRight,
+      description: "Retire seus fundos para a carteira.",
+      color: "bg-red-100 text-red-700 hover:bg-red-200",
+    },
+  ];
 
   const [balances, setBalances] = useState<Record<string, TokenBalance>>({
     
@@ -184,7 +189,7 @@ const DashboardPage = memo(function DashboardPage() {
     const minted = searchParams.get('minted');
     if (minted === 'true') {
       // Remove o parâmetro da URL
-      router.replace('/dashboard', { scroll: false });
+      router.replace(basePath, { scroll: false });
       
       // Aguarda um pouco e refaz o fetch dos saldos para garantir que está atualizado
       const timeoutId = setTimeout(() => {
@@ -194,7 +199,7 @@ const DashboardPage = memo(function DashboardPage() {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [searchParams, router, fetchBalances]);
+  }, [searchParams, router, fetchBalances, basePath]);
 
   // Escutar evento de mint completado do header
   useEffect(() => {
@@ -352,3 +357,4 @@ const DashboardPage = memo(function DashboardPage() {
 });
 
 export default DashboardPage;
+

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import {
   Wallet,
   Repeat,
@@ -21,22 +21,26 @@ import { LoaderCircle } from 'lucide-react';
 import { getPublicClient } from "@/lib/utils";
 import { useAppContext } from "@/contexts/AppContext";
 
-
-const menuItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/deposit", label: "Depositar", icon: ArrowDownLeft },
-  { href: "/dashboard/transfer", label: "Transferir", icon: Send },
-  { href: "/dashboard/swap", label: "Trocar", icon: Repeat },
-  { href: "/dashboard/withdraw", label: "Sacar", icon: ArrowUpRight },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
+  const params = useParams();
   const { logout, user, ready } = usePrivy();
   const [copied, setCopied] = useState(false);
   const router = useRouter();
   const publicClient = getPublicClient();
   const { userId, sessionId } = useAppContext();
+
+  const urlUserId = params?.userId as string;
+  const urlSessionId = params?.sessionId as string;
+  const basePath = (urlUserId && urlSessionId) ? `/${urlUserId}/${urlSessionId}/dashboard` : "/dashboard";
+
+  const menuItems = [
+    { href: basePath, label: "Dashboard", icon: LayoutDashboard },
+    { href: `${basePath}/deposit`, label: "Depositar", icon: ArrowDownLeft },
+    { href: `${basePath}/transfer`, label: "Transferir", icon: Send },
+    { href: `${basePath}/swap`, label: "Trocar", icon: Repeat },
+    { href: `${basePath}/withdraw`, label: "Sacar", icon: ArrowUpRight },
+  ];
 
 
   const wallet = user?.linkedAccounts?.find((account) => account.type === 'smart_wallet');
@@ -136,7 +140,7 @@ export function Sidebar() {
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col">
       <div className="p-6 border-b border-border">
-        <Link href="/dashboard" className="flex flex-col items-center gap-2">
+        <Link href={basePath} className="flex flex-col items-center gap-2">
           <div className="w-14 h-14 bg-blue-700 rounded-full flex items-center justify-center mx-auto mb-2">
             <Wallet className="w-7 h-7 text-primary-foreground" />
           </div>

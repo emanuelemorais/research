@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Mail, Loader2, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { usePrivy } from "@privy-io/react-auth";
 import { useCreateWallet } from '@privy-io/react-auth';
 import { KeyRound } from 'lucide-react';
@@ -28,10 +28,15 @@ export default function LoginPage() {
   const { signupWithPasskey } = useSignupWithPasskey();
   const { loading, initOAuth } = useLoginWithOAuth();
   const router = useRouter();
+  const params = useParams();
   const { ready, authenticated, user } = usePrivy();
   const { createWallet } = useCreateWallet();
   const [hasCreatedWallet, setHasCreatedWallet] = useState(false);
-  const { sessionId } = useAppContext();
+  const { sessionId, userId } = useAppContext();
+
+  const urlUserId = params?.userId as string;
+  const urlSessionId = params?.sessionId as string;
+  const dashboardPath = `/${urlUserId}/${urlSessionId}/dashboard`;
 
   const saveButtonClick = useCallback(async (buttonId: number) => {
     if (!sessionId) return;
@@ -75,17 +80,17 @@ export default function LoginPage() {
         await saveButtonClick(1); // Login buttonId = 1
 
         // Redirecionar para o dashboard
-        router.push('/dashboard');
+        router.push(dashboardPath);
       } catch (err) {
         console.error('❌ Failed to create wallet:', err);
         // Salva o clique mesmo se houver erro
         await saveButtonClick(1);
-        router.push('/dashboard');
+        router.push(dashboardPath);
       }
     };
 
     createWalletIfNeeded();
-  }, [ready, authenticated, user, createWallet, hasCreatedWallet, router, saveButtonClick]);
+  }, [ready, authenticated, user, createWallet, hasCreatedWallet, router, saveButtonClick, dashboardPath]);
 
   const handleSendCode = async () => {
     if (!email) return;

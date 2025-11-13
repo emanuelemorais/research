@@ -1,25 +1,30 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useParams } from "next/navigation"
 import { Wallet, Repeat, ArrowDownLeft, Send, ArrowUpRight, LayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const menuItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/deposit", label: "Depositar", icon: ArrowDownLeft },
-  { href: "/dashboard/swap", label: "Trocar", icon: Repeat },
-  { href: "/dashboard/transfer", label: "Transferir", icon: Send },
-  { href: "/dashboard/withdraw", label: "Sacar", icon: ArrowUpRight },
-]
-
 export function Sidebar() {
   const pathname = usePathname()
+  const params = useParams()
+  const userId = params?.userId as string
+  const sessionId = params?.sessionId as string
+
+  const basePath = userId && sessionId ? `/${userId}/${sessionId}/dashboard` : "/dashboard"
+
+  const menuItems = [
+    { href: basePath, label: "Dashboard", icon: LayoutDashboard },
+    { href: `${basePath}/deposit`, label: "Depositar", icon: ArrowDownLeft },
+    { href: `${basePath}/swap`, label: "Trocar", icon: Repeat },
+    { href: `${basePath}/transfer`, label: "Transferir", icon: Send },
+    { href: `${basePath}/withdraw`, label: "Sacar", icon: ArrowUpRight },
+  ]
 
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col">
       <div className="p-6 border-b border-border">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href={basePath} className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <Wallet className="w-5 h-5 text-primary-foreground" />
           </div>
