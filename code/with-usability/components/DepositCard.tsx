@@ -26,6 +26,7 @@ export function DepositCard() {
   const [balance, setBalance] = useState<number>(0)
   const [loading, setLoading] = useState(false)
   const [showDialog, setShowDialog] = useState(false)
+  const [pendingUpdate, setPendingUpdate] = useState(false)
   
   const { user, ready } = usePrivy();
   const { client } = useSmartWallets();
@@ -141,13 +142,15 @@ export function DepositCard() {
         // Salva a tarefa como concluída após sucesso
         await saveTaskCompleted(2); // Deposit taskId = 2
         
-        const balance = await handleBalanceOnChain(wallet, selectedToken);
-        if (balance !== undefined) {
-          setBalance(balance);
-        }
-        
-        // Limpar o campo de valor após sucesso
-        setAmount("");
+        // Marcar que há atualização pendente
+        setPendingUpdate(true);
+    } catch (error) {
+      console.error("Erro ao realizar depósito:", error);
+      toast.error("Erro ao realizar depósito");
+      // Fechar o diálogo em caso de erro também
+      setShowDialog(false);
+      setPendingUpdate(false);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -170,6 +173,40 @@ export function DepositCard() {
       toast.error(`Saldo insuficiente. Você possui ${balance.toFixed(getTokenDecimals(selectedToken))} ${selectedToken} na carteira.`);
     }
   }, [amount, balance, selectedToken])
+
+  // Função para detectar se o Google Translate está ativo
+  const isGoogleTranslateActive = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    const hasTranslateElements = 
+      document.querySelector('[class*="skiptranslate"]') !== null ||
+      document.querySelector('[id*="google_translate"]') !== null ||
+      document.body.getAttribute('data-google-translate') !== null;
+    
+    return hasTranslateElements;
+  }
+
+  // Atualizar estados após o diálogo fechar completamente
+  useEffect(() => {
+    if (!showDialog && pendingUpdate && wallet) {
+      const updateBalance = async () => {
+        const newBalance = await handleBalanceOnChain(wallet, selectedToken);
+        if (newBalance !== undefined) {
+          setBalance(newBalance);
+        }
+        setAmount("");
+        setPendingUpdate(false);
+      };
+      
+      // Delay maior quando Google Translate está ativo para evitar conflitos de DOM
+      const delay = isGoogleTranslateActive() ? 500 : 200;
+      const timeoutId = setTimeout(() => {
+        updateBalance();
+      }, delay);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [showDialog, pendingUpdate, wallet, selectedToken])
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
