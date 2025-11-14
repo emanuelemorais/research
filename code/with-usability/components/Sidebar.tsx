@@ -65,12 +65,19 @@ export function Sidebar() {
   const saveButtonClick = async (buttonId: number) => {
     if (!urlSessionId) return;
     try {
+      // Converter urlSessionId para número (a API espera número)
+      const sessionId = parseInt(urlSessionId);
+      if (isNaN(sessionId)) {
+        console.error('urlSessionId não é um número válido:', urlSessionId);
+        return;
+      }
+      
       await fetch("/api/button-click", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ buttonId, urlSessionId }),
+        body: JSON.stringify({ buttonId, sessionId }),
       });
     } catch (error) {
       console.error("Error saving button click:", error);
@@ -81,12 +88,19 @@ export function Sidebar() {
   const saveTaskCompleted = async (taskId: number) => {
     if (!urlSessionId) return;
     try {
+      // Converter urlSessionId para número (a API espera número)
+      const sessionId = parseInt(urlSessionId);
+      if (isNaN(sessionId)) {
+        console.error('urlSessionId não é um número válido:', urlSessionId);
+        return;
+      }
+      
       await fetch("/api/task-completed", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ taskId, urlSessionId }),
+        body: JSON.stringify({ taskId, sessionId }),
       });
     } catch (error) {
       console.error("Error saving completed task:", error);
@@ -101,14 +115,30 @@ export function Sidebar() {
       if (urlUserId) {
         const platformId = process.env.NEXT_PUBLIC_PLATFORM_ID;
         
+        console.log('urlUserId:', urlUserId);
+        console.log('platformId:', platformId);
+
+        // Verificar se platformId está definido
+        if (!platformId) {
+          console.error('platformId não está definido nas variáveis de ambiente');
+          return;
+        }
+
+        // Converter urlUserId para número (a API espera número, não string)
+        const userId = parseInt(urlUserId);
+        
+        if (isNaN(userId)) {
+          console.error('urlUserId não é um número válido:', urlUserId);
+          return;
+        }
+
         const sessionResponse = await fetch("/api/user/session", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ urlUserId, platformId }),
+          body: JSON.stringify({ userId, platformId: parseInt(platformId, 10) }),
         });
-
 
         if (!sessionResponse.ok) {
           const errorData = await sessionResponse.json();
@@ -118,6 +148,7 @@ export function Sidebar() {
           console.log('Resposta de sucesso:', responseData);
           await saveTaskCompleted(6);
         }
+        
       } else {
         console.warn('userId não disponível, pulando atualização de sessão');
       }
