@@ -85,8 +85,7 @@ export default function RootLayout({
                 const originalAppendChild = Node.prototype.appendChild;
                 Node.prototype.appendChild = function(child) {
                   if (child && (
-                    child.id && child.id.includes('google_translate') ||
-                    child.className && child.className.includes('skiptranslate')
+                    child.id && child.id.includes('google_translate')
                   )) {
                     return child;
                   }
