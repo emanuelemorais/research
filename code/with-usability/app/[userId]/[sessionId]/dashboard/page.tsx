@@ -14,6 +14,7 @@ import Vault from "@/abi/Vault.json";
 import { getPublicClient } from "@/lib/utils";
 import { TOKEN_ADDRESSES } from "@/lib/utils";
 import {usePrivy} from '@privy-io/react-auth';
+import { useAppContext } from "@/contexts/AppContext";
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}` | undefined;
 
@@ -29,8 +30,16 @@ const DashboardPage = memo(function DashboardPage() {
   const params = useParams();
   const userId = params?.userId as string;
   const sessionId = params?.sessionId as string;
+  const { setUserId, setSessionId } = useAppContext();
 
   const basePath =`/${userId}/${sessionId}/dashboard`;
+
+  useEffect(() => {
+    if (userId && sessionId) {
+      setUserId(userId)
+      setSessionId(sessionId)
+    }
+  }, [userId, sessionId, setUserId, setSessionId])
 
   const quickActions = [
     {
