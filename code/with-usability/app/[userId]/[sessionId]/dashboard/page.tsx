@@ -30,7 +30,7 @@ const DashboardPage = memo(function DashboardPage() {
   const userId = params?.userId as string;
   const sessionId = params?.sessionId as string;
 
-  const basePath = userId && sessionId ? `/${userId}/${sessionId}/dashboard` : "/dashboard";
+  const basePath =`/${userId}/${sessionId}/dashboard`;
 
   const quickActions = [
     {

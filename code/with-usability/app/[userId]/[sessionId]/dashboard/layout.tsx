@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Sidebar } from "@/components/Sidebar"
 import { usePrivy } from "@privy-io/react-auth"
@@ -12,12 +12,14 @@ import { DashboardHeader } from "@/components/DashboardHeader"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { logout, user, ready } = usePrivy();
   const router = useRouter();
-
+  const params = useParams();
+  const urlUserId = params?.userId as string;
+  const urlSessionId = params?.sessionId as string;
   useEffect(() => {
     if (ready && !user) {
-      router.push("/");
+      router.push(`/${urlUserId}/${urlSessionId}`);
     }
-  }, [ready, user, router]);
+  }, [ready, user, router, urlUserId, urlSessionId]);
 
   return (
     ready && user ? (

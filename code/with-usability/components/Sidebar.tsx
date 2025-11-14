@@ -114,9 +114,6 @@ export function Sidebar() {
 
       if (urlUserId) {
         const platformId = process.env.NEXT_PUBLIC_PLATFORM_ID;
-        
-        console.log('urlUserId:', urlUserId);
-        console.log('platformId:', platformId);
 
         // Verificar se platformId está definido
         if (!platformId) {
@@ -243,7 +240,7 @@ export function Sidebar() {
           )}
         >
           <LogOut className="w-4 h-4" />
-          Logout
+          Sair
         </Button>
       </div>
     </aside>
