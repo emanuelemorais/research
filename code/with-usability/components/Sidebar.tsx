@@ -28,11 +28,11 @@ export function Sidebar() {
   const [copied, setCopied] = useState(false);
   const router = useRouter();
   const publicClient = getPublicClient();
-  const { userId, sessionId } = useAppContext();
+  //const { userId, sessionId } = useAppContext();
 
   const urlUserId = params?.userId as string;
   const urlSessionId = params?.sessionId as string;
-  const basePath = (urlUserId && urlSessionId) ? `/${urlUserId}/${urlSessionId}/dashboard` : "/dashboard";
+  const basePath =  `/${urlUserId}/${urlSessionId}/dashboard`;
 
   const menuItems = [
     { href: basePath, label: "Dashboard", icon: LayoutDashboard },
@@ -63,14 +63,14 @@ export function Sidebar() {
   };
 
   const saveButtonClick = async (buttonId: number) => {
-    if (!sessionId) return;
+    if (!urlSessionId) return;
     try {
       await fetch("/api/button-click", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ buttonId, sessionId }),
+        body: JSON.stringify({ buttonId, urlSessionId }),
       });
     } catch (error) {
       console.error("Error saving button click:", error);
@@ -79,14 +79,14 @@ export function Sidebar() {
   };
 
   const saveTaskCompleted = async (taskId: number) => {
-    if (!sessionId) return;
+    if (!urlSessionId) return;
     try {
       await fetch("/api/task-completed", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ taskId, sessionId }),
+        body: JSON.stringify({ taskId, urlSessionId }),
       });
     } catch (error) {
       console.error("Error saving completed task:", error);
@@ -98,7 +98,7 @@ export function Sidebar() {
     try {
       await saveButtonClick(6); 
 
-      if (userId) {
+      if (urlUserId) {
         const platformId = process.env.NEXT_PUBLIC_PLATFORM_ID;
         
         const sessionResponse = await fetch("/api/user/session", {
@@ -106,11 +106,9 @@ export function Sidebar() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId, platformId }),
+          body: JSON.stringify({ urlUserId, platformId }),
         });
 
-        console.log('Status da resposta:', sessionResponse.status);
-        console.log('Response OK?', sessionResponse.ok);
 
         if (!sessionResponse.ok) {
           const errorData = await sessionResponse.json();
@@ -128,14 +126,14 @@ export function Sidebar() {
     }
     
     await logout();
-    window.location.href = `${process.env.NEXT_PUBLIC_PRE_FORM_LINK}/${userId}/testing-journey`;
+    window.location.href = `${process.env.NEXT_PUBLIC_PRE_FORM_LINK}/${urlUserId}/testing-journey`;
   };
 
   useEffect(() => {
     if (ready && !user) {
-      router.push("/");
+      router.push(`/${urlUserId}/${urlSessionId}`);
     }
-  }, [ready, user, router]);
+  }, [ready, user, router, urlUserId, urlSessionId]);
 
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col">
@@ -210,7 +208,7 @@ export function Sidebar() {
         <Button
           onClick={handleLogout}
           className={cn(
-            "cursor-pointer flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg transition-colors bg-blue-700 hover:bg-blue-600 text-primary-foreground font-medium"
+            "cursor-pointer flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg transition-colors bg-red-700 hover:bg-red-600 text-primary-foreground font-medium"
           )}
         >
           <LogOut className="w-4 h-4" />
