@@ -17,9 +17,6 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "DeFi Platform",
-  other: {
-    "google": "notranslate",
-  },
 };
 
 export default function RootLayout({
@@ -28,13 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" translate="no" suppressHydrationWarning>
-      <head>
-        <meta name="google" content="notranslate" />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        translate="no"
         suppressHydrationWarning
       >
         <ClarityInit />

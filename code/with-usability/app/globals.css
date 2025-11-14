@@ -126,29 +126,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* Bloquear completamente o Google Translate */
-#google_translate_element,
-.skiptranslate,
-[id*="google_translate"],
-[class*="skiptranslate"],
-.goog-te-banner-frame,
-.goog-te-menu-frame,
-.goog-te-menu-value,
-body.translated-ltr,
-html.translated-ltr,
-body.translated-rtl,
-html.translated-rtl {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  width: 0 !important;
-  position: absolute !important;
-  left: -9999px !important;
-}
-
-/* Prevenir que o Google Translate modifique elementos */
-* {
-  translate: no !important;
-}
