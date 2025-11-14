@@ -23,7 +23,7 @@ export default function RootLayout({
 
 
   return (
-    <html lang="pt-BR">
+    <html translate="no">
       <body className={`font-sans antialiased`}>
         <ClarityInit />
         <RainbowKitLayout>
